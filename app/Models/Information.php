@@ -30,7 +30,6 @@ class Information extends Model
       return $this->hasMany(Consultation::class);
     }
 
-
     public function local_council()
     {
       return $this->belongsTo(LocalCouncil::class,'citizen_question_locall_council');
