@@ -5,6 +5,8 @@ use Inertia\Inertia;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CitizenInformationController;
+
 
 Route::get('/', function () {
     return Inertia::render('Home');
@@ -35,3 +37,12 @@ Route::group(['middleware' => 'auth', 'prefix' => 'dashboard'], function () {
     Route::get('citizen',[DashboardController::class,'citizen'])->name('dashboard.citizen');
     Route::get('official',[DashboardController::class,'official'])->name('dashboard.official');
 });
+
+
+
+//Dashboard
+Route::group(['middleware' => 'auth', 'prefix' => 'citizen'], function () {
+    Route::get('create',[CitizenInformationController::class,'create'])->name('information.create');
+
+});
+
