@@ -278,22 +278,96 @@ const handleAttachment = (files) => {
 const handleBPLProof = (file) => {
     form.bplProof = file
 }
+//
+// const submitForm = () => {
+//     form.post(route('information.store'), {
+//         forceFormData: true,
+//         onStart: () => {
+//             // Optional: show loading
+//         },
+//         onSuccess: () => {
+//             // Optional: reset form or redirect
+//             form.reset()
+//         },
+//         onError: (errors) => {
+//             // Optional: show error
+//             console.error(errors)
+//         }
+//     })
+// }
 
-const submitForm = () => {
-    form.post(route('information.store'), {
-        forceFormData: true,
-        onStart: () => {
-            // Optional: show loading
-        },
-        onSuccess: () => {
-            // Optional: reset form or redirect
-            form.reset()
-        },
-        onError: (errors) => {
-            // Optional: show error
-            console.error(errors)
-        }
+const submitForm=e=>{
+    $q.dialog({
+        title:'Confirmation',
+        message:'Do you want to submit the application?',
+        ok:'Yes',
+        cancel:'No'
     })
+        .onOk(()=>{
+            $q.loading.show({
+                boxClass: 'bg-grey-2 text-grey-9',
+                spinnerColor: 'primary', message: ' Submitting...'
+            });
+
+            const formData = new FormData()
+            formData.append('department', form.department)
+            formData.append('local_council', form.localCouncil)
+            formData.append('question', form.question)
+            formData.append('isLifeOrLiberty', form.isLifeOrLiberty)
+
+            // Append each attachment
+            form.attachment.forEach((file, index) => {
+                formData.append(`attachment[]`, file) // or `attachments[]` if your backend expects that
+            })
+
+            axios.post(route('information.store'),formData,{
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }).then(res=>{
+                const {token,amount,order_id} = res.data;
+                initRazorpay({token,order_id,amount})
+            }).catch(err=>{
+                console.log(err.response.data)
+                $q.notify({type:'negative',message:err?.response?.data?.message || err.toString()});
+                if (!!err?.response?.data?.errors) {
+                    form.errors = err.response.data.errors;
+                }
+            }).finally(()=>$q.loading.hide());
+        })
 }
+
+const initRazorpay = data => {
+    try {
+        const options = {
+            key:  env('RAZORPAY_KEY_ID'),
+            amount: data.amount,
+            currency: data.currency,
+            name: 'MIC Mizoram',
+            description: 'RTI Payment',
+            order_id: data.order_id,
+            callback_url : route('payment.callback'),
+            handler: function (response) {
+                // This runs after successful payment
+                console.log('Payment successful', response)
+                alert('Payment successful: ' + response.razorpay_payment_id)
+            },
+            prefill: {
+                name: 'Test User',
+                email: 'test@example.com',
+                contact: '9999999999'
+            },
+            theme: {
+                color: '#3399cc'
+            }
+        }
+
+        const rzp = new window.Razorpay(options)
+        rzp.open()
+    } catch (err) {
+        console.error('Payment initiation failed', err)
+    }
+}
+
 </script>
 
