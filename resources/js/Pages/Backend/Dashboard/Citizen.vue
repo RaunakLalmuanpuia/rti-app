@@ -108,9 +108,10 @@
 </template>
 
 <script setup>
+import BackendLayout from "@/Layouts/BackendLayout.vue";
 import { ref, reactive } from 'vue'
 import { router } from '@inertiajs/vue3'
-
+defineOptions({ layout: BackendLayout });
 // Props from Laravel
 const props = defineProps({
     information: Object,

@@ -43,6 +43,8 @@ Route::group(['middleware' => 'auth', 'prefix' => 'dashboard'], function () {
 //Dashboard
 Route::group(['middleware' => 'auth', 'prefix' => 'citizen'], function () {
     Route::get('create',[CitizenInformationController::class,'create'])->name('information.create');
-
+    Route::get('search-department',[CitizenInformationController::class,'searchDepartment'])->name('information.search-department');
+    Route::get('get-local_council',[CitizenInformationController::class,'getLocalCouncil'])->name('information.get-local_council');
+    Route::post('store', [CitizenInformationController::class, 'store'])->name('information.store');
 });
 

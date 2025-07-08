@@ -1,213 +1,286 @@
 <template>
-    <div class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
-        <form @submit.prevent="submitForm" class="bg-white max-w-3xl w-full p-8 rounded-md shadow-sm">
-            <p class="text-2xl font-normal mb-3 leading-tight">
-                New RTI Application / RTI hmanga dilna Form
-            </p>
-            <p class="mb-4 text-sm leading-snug">
+    <div class="q-pa-lg flex flex-center">
+        <q-form @submit.prevent="submitForm" class="bg-white q-pa-xl q-ma-md rounded-borders shadow-2 full-width" style="max-width: 700px">
+            <div class="text-h6 q-mb-sm">New RTI Application / RTI hmanga dilna Form</div>
+            <div class="text-body2 q-mb-md">
                 I zawh duh zawk thlang ang che / Please select where you want to ask question.
-            </p>
+            </div>
 
             <!-- Department / Local Council -->
-            <div class="mb-6 text-sm leading-tight">
-                <label class="inline-flex items-center mr-4">
-                    <input
-                        type="checkbox"
-                        :checked="form.toDepartment"
-                        @change="selectDepartment"
-                        class="form-checkbox text-blue-600"
-                    />
-                    <span class="ml-2 select-none">Department</span>
-                </label>
-                <label class="inline-flex items-center">
-                    <input
-                        type="checkbox"
-                        :checked="form.toLocalCouncil"
-                        @change="selectLocalCouncil"
-                        class="form-checkbox text-blue-600"
-                    />
-                    <span class="ml-2 select-none">Local Council</span>
-                </label>
+            <div class="q-gutter-sm row items-center q-mb-md">
+                <q-checkbox
+                    :model-value="form.toDepartment"
+                    @click="handleDepartmentToggle"
+                    label="Department"
+                />
+                <q-checkbox
+                    :model-value="form.toLocalCouncil"
+                    @click="handleLocalCouncilToggle"
+                    label="Local Council"
+                />
             </div>
 
             <!-- Department Select -->
-            <div v-if="form.toDepartment" class="mb-4">
-                <label for="department" class="block mb-1 text-sm font-normal text-gray-900">Department</label>
-                <select
-                    id="department"
+            <div v-if="form.toDepartment" class="q-mb-md">
+                <q-select
+                    filled
                     v-model="form.department"
-                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                >
-                    <option value="">Select Department</option>
-                    <option>Administrative Training Institute</option>
-                    <option>Education Department</option>
-                    <option>Health Department</option>
-                </select>
+                    :options="departmentOptions"
+                    @filter="searchDepartments"
+                    :loading="loadingDepartments"
+                    use-input
+                    input-debounce="300"
+                    map-options
+                    emit-value
+                    option-value="id"
+                    option-label="name"
+                    label="Search Department"
+                    clearable
+                />
             </div>
 
-            <!-- district Select -->
-            <div v-if="form.toLocalCouncil" class="mb-4">
-                <label for="department" class="block mb-1 text-sm font-normal text-gray-900">Department</label>
-                <select
-                    id="department"
-                    v-model="form.department"
-                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                >
-                    <option value="">Select Department</option>
-                    <option>Administrative Training Institute</option>
-                    <option>Education Department</option>
-                    <option>Health Department</option>
-                </select>
+            <!-- District Select -->
+            <div v-if="form.toLocalCouncil" class="q-mb-md">
+                <q-select
+                    filled
+                    v-model="form.district"
+                    :options="['Aizawl', 'Lunglei']"
+                    label="Select District"
+                    clearable
+                    class="q-mb-md"
+                />
+
             </div>
 
             <!-- Local Council Select -->
-            <div v-if="form.toLocalCouncil" class="mb-4">
-                <label for="department" class="block mb-1 text-sm font-normal text-gray-900">Department</label>
-                <select
-                    id="department"
-                    v-model="form.department"
-                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                >
-                    <option value="">Select Department</option>
-                    <option>Administrative Training Institute</option>
-                    <option>Education Department</option>
-                    <option>Health Department</option>
-                </select>
+            <div v-if="form.toLocalCouncil" class="q-mb-md">
+                <q-select
+                    v-if="form.toLocalCouncil"
+                    filled
+                    v-model="form.localCouncil"
+                    :options="localCouncilOptions"
+                    label="Select Local Council"
+                    option-label="label"
+                    option-value="value"
+                    emit-value
+                    map-options
+                    clearable
+                    class="q-mb-md"
+                />
             </div>
 
             <!-- Question -->
-            <div class="mb-4">
-                <label for="question" class="block mb-1 text-sm font-normal text-gray-900">Question / Zawhna</label>
-                <textarea
-                    id="question"
+            <div class="q-mb-md">
+                <q-input
+                    filled
                     v-model="form.question"
-                    rows="5"
+                    type="textarea"
+                    rows="6"
+                    label="Question / Zawhna"
                     placeholder="Type your questions here"
-                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-700 text-sm resize-y focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                ></textarea>
+                />
             </div>
 
             <!-- Attachment -->
-            <div class="mb-6 text-sm text-gray-900">
-                <label for="attachment" class="cursor-pointer">Attachment (Optional) (image/pdf)</label>
-                <input
-                    type="file"
-                    id="attachment"
-                    @change="handleAttachment"
-                    accept="image/*,application/pdf"
-                    class="ml-2 inline-block"
+            <div class="q-mb-md">
+                <q-file
+                    v-model="form.attachment"
+                    label="Attachment (Optional) (image/pdf)"
+                    accept=".jpg, .jpeg, .png, .gif, .pdf"
+                    use-chips
+                    multiple
+                    counter
+                    @update:model-value="handleAttachment"
+                    outlined
+                    filled
                 />
-                <span class="ml-2">{{ form.attachment?.name || 'No files selected.' }}</span>
             </div>
 
-            <!-- BPL -->
-            <div class="mb-4 text-sm leading-tight">
-                <label class="inline-flex items-start">
-                    <input type="checkbox" v-model="form.isBPL" class="form-checkbox mt-1 text-blue-600" />
-                    <span class="ml-2 select-none">
-                        Below Poverty Line (BPL) ka ni e / I belong to Below Poverty Line (BPL) community
-                    </span>
-                </label>
-            </div>
+            <!-- BPL Checkbox -->
+            <q-checkbox
+                v-model="form.isBPL"
+                label="Below Poverty Line (BPL) ka ni e / I belong to Below Poverty Line (BPL) community"
+                class="q-mb-md"
+            />
 
-            <!-- Rule 6(a) Info -->
-            <div v-if="form.isBPL" class="mb-6 p-4 bg-gray-100 rounded-md text-gray-700 text-sm leading-relaxed">
-                <p class="mb-1 font-normal">Mizoram RTI Rules, 2010, Rule 6(a)</p>
-                <p class="text-gray-400 text-xs font-light">
+            <!-- BPL Info -->
+            <div v-if="form.isBPL" class="q-pa-md bg-grey-2 rounded-borders text-body2 text-grey-8 q-mb-md">
+                <p class="q-mb-xs"><strong>Mizoram RTI Rules, 2010, Rule 6(a)</strong></p>
+                <p class="text-caption text-grey-6">
                     Persons who are of Below Poverty Line as may be determined by the State Government of Mizoram for
                     <strong>provisions of information related to welfare of BPL.</strong>
                 </p>
             </div>
 
-            <!-- BPL Proof -->
-            <div v-if="form.isBPL" class="mb-6 text-sm text-gray-900">
-                <label for="bplproof" class="cursor-pointer">BPL ID Proof:</label>
-                <input type="file" id="bplproof" @change="handleBPLProof" class="ml-2 inline-block" />
-                <span class="ml-2">{{ form.bplProof?.name || 'No files selected.' }}</span>
+            <!-- BPL Proof Upload -->
+            <div v-if="form.isBPL" class="q-mb-md">
+                <q-file
+                    v-model="form.bplProof"
+                    label="Upload BPL Proof"
+                    accept=".jpg, .jpeg, .png, .gif, .pdf"
+                    @update:model-value="handleBPLProof"
+                    filled
+                    outlined
+                    clearable
+                />
             </div>
 
             <!-- Life or Liberty -->
-            <div class="mb-4 text-sm leading-tight">
-                <label class="inline-flex items-start">
-                    <input type="checkbox" v-model="form.isLifeOrLiberty" class="form-checkbox mt-1 text-blue-600" />
-                    <span class="ml-2 select-none">
-                        If it concerns the life or liberty of a person / Mi nunna emaw, zalenna khawih chungchang
-                    </span>
-                </label>
-            </div>
+            <q-checkbox
+                v-model="form.isLifeOrLiberty"
+                label="If it concerns the life or liberty of a person / Mi nunna emaw, zalenna khawih chungchang"
+                class="q-mb-md"
+            />
 
             <!-- RTI Act Section Info -->
-            <div v-if="form.isLifeOrLiberty" class="mb-6 p-4 bg-gray-100 rounded-md text-gray-700 text-xs leading-relaxed">
-                <p class="mb-1 font-semibold text-sm">Provisio of Section 7(1) of the RTI Act, 2005:</p>
-                <p class="mb-2 text-gray-400 text-[10px] font-light">
-                    (1) Subject to the proviso to sub-section (2) of section 5 or the proviso to sub-section (3) of section 6, the
-                    Central Public Information Officer or State Public Information Officer, as the case may be on receipt of a
-                    request under section 6 shall, as expeditiously as possible, and in any case within thirty days of the
-                    receipt of the request, either provide the information on payment of such fee as may be prescribed or reject
-                    the request for any of the reasons specified in sections 8 and 9: Provided that where the information sought
-                    for concerns the life or liberty of a person, the same shall be provided within forty-eight hours of the
-                    receipt of the request.
+            <div v-if="form.isLifeOrLiberty" class="q-pa-md bg-grey-2 rounded-borders text-caption text-grey-8 q-mb-md">
+                <p class="text-weight-medium">Provisio of Section 7(1) of the RTI Act, 2005:</p>
+                <p class="text-grey-6 q-mb-sm">
+                    Where the information sought for concerns the life or liberty of a person, the same shall be provided within
+                    forty-eight hours of the receipt of the request.
                 </p>
-                <label class="inline-flex items-center cursor-pointer">
-                    <input type="checkbox" v-model="form.understandsConsequences" class="form-checkbox text-gray-900" />
-                    <span class="ml-2 font-normal text-sm select-none">I understand the consequences</span>
-                </label>
+                <q-checkbox
+                    v-model="form.understandsConsequences"
+                    label="I understand the consequences"
+                    dense
+                />
             </div>
 
-            <!-- Submit -->
-
-            <button v-if="form.isBPL && form.bplProof"
+            <!-- Submit Button -->
+            <q-btn
                 type="submit"
-                class="w-full bg-sky-400 hover:bg-sky-500 text-white font-bold text-lg rounded-md py-3 transition-colors duration-200"
-            >
-                Submit
-            </button>
-
-            <button v-else
-                type="submit"
-                class="w-full bg-sky-400 hover:bg-sky-500 text-white font-bold text-lg rounded-md py-3 transition-colors duration-200"
-            >
-                Make Payment
-            </button>
-        </form>
+                :label="form.isBPL && form.bplProof ? 'Submit' : 'Make Payment'"
+                color="primary"
+                class="full-width"
+                unelevated
+                rounded
+            />
+        </q-form>
     </div>
 </template>
 
 <script setup>
-import { useForm } from '@inertiajs/vue3'
+import BackendLayout from "@/Layouts/BackendLayout.vue";
+import { useForm, router } from '@inertiajs/vue3'
+import { useQuasar } from 'quasar'
+import { ref, watch } from 'vue'
+import axios from "axios";
+defineOptions({ layout: BackendLayout });
+
+
+
+const $q = useQuasar()
 
 const form = useForm({
-    toDepartment: true,
+    toDepartment: false,
     toLocalCouncil: false,
     department: '',
+    district:'',
+    localCouncil:'',
     question: '',
-    attachment: null,
+    attachment: [],
     isBPL: false,
     bplProof: null,
     isLifeOrLiberty: false,
     understandsConsequences: false,
 })
 
-const selectDepartment = () => {
-    form.toDepartment = true
-    form.toLocalCouncil = false
+const handleDepartmentToggle = () => {
+    if (!form.toDepartment) {
+        form.toDepartment = true;
+        form.toLocalCouncil = false;
+        form.district = '';
+        form.localCouncil = '';
+    } else {
+        form.toDepartment = false;
+        form.department = '';
+    }
+};
+
+const handleLocalCouncilToggle = () => {
+    if (!form.toLocalCouncil) {
+        form.toLocalCouncil = true;
+        form.toDepartment = false;
+        form.department = '';
+    } else {
+        form.toLocalCouncil = false;
+        form.district = '';
+        form.localCouncil = '';
+    }
+};
+
+
+const departmentOptions = ref([])
+const loadingDepartments = ref(false)
+
+const localCouncilOptions = ref([])
+const loadingLocalCouncils = ref(false)
+
+const searchDepartments = async (val, update, abort) => {
+    if (!val || val.length < 2) {
+        update(() => {
+            departmentOptions.value = []
+        })
+        return
+    }
+    loadingDepartments.value = true
+
+    const url = route('information.search-department') // e.g. `/departments/search`
+
+    axios.get(url, { params: { search: val } })
+        .then(res => {
+            update(() => {
+                departmentOptions.value = res.data
+            })
+        })
+        .catch(err => {
+            $q.notify({
+                type: 'negative',
+                message: err.response?.data?.message || 'Failed to fetch departments',
+            })
+        })
+        .finally(() => {
+
+            loadingDepartments.value = false
+        })
 }
 
-const selectLocalCouncil = () => {
-    form.toLocalCouncil = true
-    form.toDepartment = false
+
+const fetchLocalCouncils = async (district) => {
+    localCouncilOptions.value = []
+    if (!district) return
+
+    try {
+        const res = await axios.get(route('information.get-local_council'), { params: { district: district } })
+        localCouncilOptions.value = res.data.map((c) => ({
+            label: c.name,
+            value: c.id,
+        }))
+    } catch (e) {
+        console.error('Failed to fetch local councils', e)
+    }
 }
 
-const handleAttachment = (e) => {
-    form.attachment = e.target.files[0]
+// Watch for district changes
+watch(() => form.district, (newDistrict) => {
+    form.localCouncil = ''
+    fetchLocalCouncils(newDistrict)
+})
+
+
+
+// This handles updates to the file input
+const handleAttachment = (files) => {
+    // Directly assign files (Quasar handles `v-model` as array when multiple is enabled)
+    form.attachment = Array.isArray(files) ? files : [files]
 }
 
-const handleBPLProof = (e) => {
-    form.bplProof = e.target.files[0]
+const handleBPLProof = (file) => {
+    form.bplProof = file
 }
 
 const submitForm = () => {
-    form.post(route('rti.store'), {
+    form.post(route('information.store'), {
         forceFormData: true,
         onStart: () => {
             // Optional: show loading
