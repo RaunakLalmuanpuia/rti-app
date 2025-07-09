@@ -84,4 +84,9 @@ class CitizenInformationController extends Controller
     }
 
 
+    public function show(){
+        return Inertia::render('Backend/Citizen/Information/Show',[]);
+    }
+
+
 }

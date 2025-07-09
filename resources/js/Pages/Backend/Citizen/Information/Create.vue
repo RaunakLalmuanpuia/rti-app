@@ -161,12 +161,15 @@
 
 <script setup>
 import BackendLayout from "@/Layouts/BackendLayout.vue";
-import { useForm, router } from '@inertiajs/vue3'
+import {useForm, router, usePage} from '@inertiajs/vue3'
 import { useQuasar } from 'quasar'
-import { ref, watch, onMounted } from 'vue'
+import {ref, watch, onMounted, computed} from 'vue'
 import axios from "axios";
 
 defineOptions({ layout: BackendLayout });
+
+const page = usePage()
+const user = computed(() => page.props.auth.user)
 
 const props = defineProps({
     razorpayKey: String
@@ -217,7 +220,6 @@ const departmentOptions = ref([])
 const loadingDepartments = ref(false)
 
 const localCouncilOptions = ref([])
-const loadingLocalCouncils = ref(false)
 
 const searchDepartments = async (val, update, abort) => {
     if (!val || val.length < 2) {
@@ -247,8 +249,6 @@ const searchDepartments = async (val, update, abort) => {
             loadingDepartments.value = false
         })
 }
-
-
 const fetchLocalCouncils = async (district) => {
     localCouncilOptions.value = []
     if (!district) return
@@ -263,42 +263,19 @@ const fetchLocalCouncils = async (district) => {
         console.error('Failed to fetch local councils', e)
     }
 }
-
 // Watch for district changes
 watch(() => form.district, (newDistrict) => {
     form.localCouncil = ''
     fetchLocalCouncils(newDistrict)
 })
-
-
-
 // This handles updates to the file input
 const handleAttachment = (files) => {
     // Directly assign files (Quasar handles `v-model` as array when multiple is enabled)
     form.attachment = Array.isArray(files) ? files : [files]
 }
-
 const handleBPLProof = (file) => {
     form.bplProof = file
 }
-
-// const submitForm = () => {
-//     form.post(route('information.store'), {
-//         forceFormData: true,
-//         onStart: () => {
-//             // Optional: show loading
-//         },
-//         onSuccess: () => {
-//             // Optional: reset form or redirect
-//             form.reset()
-//         },
-//         onError: (errors) => {
-//             // Optional: show error
-//             console.error(errors)
-//         }
-//     })
-// }
-
 const submitForm=e=>{
     $q.dialog({
         title:'Confirmation',
@@ -361,9 +338,9 @@ const initRazorpay = data => {
             //     alert('Payment successful: ' + response.razorpay_payment_id)
             // },
             prefill: {
-                name: 'Test User',
-                email: 'test@example.com',
-                contact: '9999999999'
+                name: user.value.name,
+                email: user.value.email,
+                contact: user.value.contact,
             },
             theme: {
                 color: '#3399cc'

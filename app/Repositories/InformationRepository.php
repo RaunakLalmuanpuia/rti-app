@@ -45,7 +45,6 @@ class InformationRepository
             $prePayment->life_or_death = false;
         }
 
-        $data = [];
 
         if ($request['attachment'] != null) {
             $data = [];
@@ -131,6 +130,7 @@ class InformationRepository
         $information->citizen_address = $user->address;
         $information->citizen_question = $prePayment['citizen_question'];
         $information->citizen_question_file = $prePayment['citizen_question_file'];
+        $information->life_or_death = $prePayment['life_or_death'];
 
         if(!is_null($prePayment['citizen_question_department'])){
             $selectedDept = Department::select('id')->where('id',$prePayment['citizen_question_department'])->first();
@@ -142,13 +142,6 @@ class InformationRepository
             $information->citizen_question_locall_council = $selectedLC->id;
         }
 
-        if($prePayment['life_or_death'] == "true" ){
-            $information->life_or_death = true;
-        }
-        else
-        {
-            $information->life_or_death = false;
-        }
 
         if(!is_null($prePayment['citizen_question_department'])){
             //2. IF SAPIO PRESENT SENT NOTIFICATION TO SAPIO ELSE SENT TO SPIO
@@ -171,6 +164,8 @@ class InformationRepository
 
 
         $information->save();
+
+        //Notify Spio
 
         return true;
 

@@ -66,6 +66,7 @@
                     v-for="(info, index) in information.data"
                     :key="info.id"
                     :class="index % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
+                    @click="$inertia.get(route('information.show'))"
                 >
                     <td class="border border-gray-300 px-3 py-2 align-top">{{ info.citizen_name }}</td>
                     <td class="border border-gray-300 px-3 py-2 align-top">{{ info.citizen_question }}</td>

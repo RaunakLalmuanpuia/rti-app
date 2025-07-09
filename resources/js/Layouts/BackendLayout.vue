@@ -34,7 +34,7 @@
             </q-toolbar>
         </q-header>
 
-        <q-drawer style="background-color: #9177FE;" class="text-black" show-if-above v-model="leftDrawerOpen" side="left">
+        <q-drawer style="background-color: #9177FE;" class="text-white" show-if-above v-model="leftDrawerOpen" side="left">
             <!-- drawer content -->
             <q-list class="bg-transparent full-height">
                 <div class="column items-center q-gutter-md q-pa-lg">
@@ -44,10 +44,10 @@
                         RTI Online
                     </div>
                 </div>
-
+                <q-separator class="q-my-sm"/>
                 <div v-if="user.role === 0">
                     <q-item :active="route().current()==='information.create'" active
-                            active-class="active-menu text-accent"
+                            active-class="active-menu "
                             clickable
                             @click="$inertia.get(route('information.create'))">
                         <q-item-section avatar>
@@ -67,10 +67,10 @@
                         </q-item-section>
                     </q-item>
 
-                    <q-separator class="q-my-sm"/>
+
 
                     <q-item :active="route().current()==='dashboard.citizen'" active
-                            active-class="active-menu text-accent"
+                            active-class="active-menu"
                             clickable
                             @click="$inertia.get(route('dashboard.citizen'))">
                         <q-item-section avatar>
@@ -94,7 +94,7 @@
                         </q-item-section>
                     </q-item>
 
-                    <q-separator class="q-my-sm"/>
+
 
                 </div>
 
