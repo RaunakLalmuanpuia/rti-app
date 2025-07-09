@@ -14,6 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         //
+        $middleware->validateCsrfTokens(except: [
+            'callback/information',
+        ]);
+
         $middleware->web(append: [
             HandleInertiaRequests::class,
         ]);

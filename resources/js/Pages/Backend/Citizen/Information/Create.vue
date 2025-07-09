@@ -163,11 +163,14 @@
 import BackendLayout from "@/Layouts/BackendLayout.vue";
 import { useForm, router } from '@inertiajs/vue3'
 import { useQuasar } from 'quasar'
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import axios from "axios";
+
 defineOptions({ layout: BackendLayout });
 
-
+const props = defineProps({
+    razorpayKey: String
+})
 
 const $q = useQuasar()
 
@@ -278,7 +281,7 @@ const handleAttachment = (files) => {
 const handleBPLProof = (file) => {
     form.bplProof = file
 }
-//
+
 // const submitForm = () => {
 //     form.post(route('information.store'), {
 //         forceFormData: true,
@@ -313,7 +316,7 @@ const submitForm=e=>{
             formData.append('department', form.department)
             formData.append('local_council', form.localCouncil)
             formData.append('question', form.question)
-            formData.append('isLifeOrLiberty', form.isLifeOrLiberty)
+            formData.append('life_or_death', form.isLifeOrLiberty)
 
             // Append each attachment
             form.attachment.forEach((file, index) => {
@@ -325,8 +328,8 @@ const submitForm=e=>{
                     'Content-Type': 'multipart/form-data'
                 }
             }).then(res=>{
-                const {token,amount,order_id} = res.data;
-                initRazorpay({token,order_id,amount})
+                const {order_id,amount,currency, receipt} = res.data;
+                initRazorpay({order_id,amount,currency,receipt})
             }).catch(err=>{
                 console.log(err.response.data)
                 $q.notify({type:'negative',message:err?.response?.data?.message || err.toString()});
@@ -338,20 +341,25 @@ const submitForm=e=>{
 }
 
 const initRazorpay = data => {
+    if (!window.Razorpay) {
+        alert('Razorpay SDK not loaded yet. Please try again.')
+        return
+    }
+
     try {
         const options = {
-            key:  env('RAZORPAY_KEY_ID'),
+            key: props.razorpayKey,
             amount: data.amount,
             currency: data.currency,
             name: 'MIC Mizoram',
             description: 'RTI Payment',
             order_id: data.order_id,
-            callback_url : route('payment.callback'),
-            handler: function (response) {
-                // This runs after successful payment
-                console.log('Payment successful', response)
-                alert('Payment successful: ' + response.razorpay_payment_id)
-            },
+            callback_url : route('callback.information'),
+            // handler: function (response) {
+            //     // This runs after successful payment
+            //     console.log('Payment successful', response)
+            //     alert('Payment successful: ' + response.razorpay_payment_id)
+            // },
             prefill: {
                 name: 'Test User',
                 email: 'test@example.com',
@@ -368,6 +376,10 @@ const initRazorpay = data => {
         console.error('Payment initiation failed', err)
     }
 }
-
+onMounted(() => {
+    const scriptElement = document.createElement('script')
+    scriptElement.setAttribute('src', 'https://checkout.razorpay.com/v1/checkout.js')
+    document.head.appendChild(scriptElement)
+})
 </script>
 

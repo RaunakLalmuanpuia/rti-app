@@ -6,7 +6,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CitizenInformationController;
-
+use App\Http\Controllers\PaymentCallbackController;
 
 Route::get('/', function () {
     return Inertia::render('Home');
@@ -40,11 +40,18 @@ Route::group(['middleware' => 'auth', 'prefix' => 'dashboard'], function () {
 
 
 
-//Dashboard
+//Citizen
 Route::group(['middleware' => 'auth', 'prefix' => 'citizen'], function () {
     Route::get('create',[CitizenInformationController::class,'create'])->name('information.create');
     Route::get('search-department',[CitizenInformationController::class,'searchDepartment'])->name('information.search-department');
     Route::get('get-local_council',[CitizenInformationController::class,'getLocalCouncil'])->name('information.get-local_council');
     Route::post('store', [CitizenInformationController::class, 'store'])->name('information.store');
 });
+
+
+//Payment Callback
+Route::group(['prefix'=>'callback'], function () {
+    Route::post('information', [PaymentCallbackController::class, 'callback'])->name('callback.information');
+});
+
 

@@ -3,18 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
-use App\Models\District;
 use App\Models\LocalCouncil;
+use App\Repositories\InformationRepository;
+
+use App\Traits\CanPay;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class CitizenInformationController extends Controller
 {
+
+
+    use CanPay;
+    private InformationRepository $informationRepository;
+
+    public function __construct(InformationRepository $informationRepository)
+    {
+        $this->repository = $informationRepository;
+    }
     public function create(){
 
-        return Inertia::render('Backend/Citizen/Information/Create');
+        return Inertia::render('Backend/Citizen/Information/Create',[
+            'razorpayKey' => env('RAZORPAY_KEY_ID')
+        ]);
     }
-
     public function searchDepartment(Request $request)
     {
         $search = $request->input('search', '');
@@ -32,7 +44,6 @@ class CitizenInformationController extends Controller
 
         return response()->json($departments);
     }
-
     public function getLocalCouncil(Request $request){
 
 
@@ -43,10 +54,32 @@ class CitizenInformationController extends Controller
         return response()->json($councils);
 
     }
-
     public function store(Request $request){
-        dd($request->all());
 
+        $request->validate([
+            'department' => ['required_without:local_council', 'exists:departments,id'],
+            'local_council' => ['nullable', 'exists:local_councils,id'],
+            'question' => ['required', 'string'],
+            'life_or_death' => ['required'],
+            'attachment' => ['nullable', 'array'],
+            'attachment.*' => ['file', 'mimes:pdf,jpg,jpeg,png']
+        ]);
+
+        $razorpayOrder=$this->initiatePayment();
+
+        $order_id = $razorpayOrder['id'];
+        $amount  = $razorpayOrder['amount'];
+
+        $preInformation=$this->repository->storePreInformation($request,$order_id,$amount);
+
+        abort_if(blank($preInformation),500,'Something went wrong');
+
+        return response()->json([
+            'order_id' => $razorpayOrder['id'],
+            'amount' => $razorpayOrder['amount'],
+            'currency' => $razorpayOrder['currency'],
+            'receipt' => $razorpayOrder['receipt'],
+        ]);
 
     }
 
