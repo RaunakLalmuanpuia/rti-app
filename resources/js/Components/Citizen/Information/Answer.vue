@@ -1,40 +1,8 @@
 <template>
-<!--    Answer-->
-    <q-card>
-        <q-card-section>
-            <div class="text-h6 text-purple-600">Answers</div>
-        </q-card-section>
-
-        <q-card-section>
-            <q-input
-                filled
-                readonly
-                type="textarea"
-                label="Answer"
-                v-model="answer"
-                class="bg-grey-2"
-                autogrow
-            />
-            <p class="text-subtitle2 q-mt-sm">Answered on: 26th Aug, 24 11:50:47 am</p>
-            <p class="text-subtitle2 q-mt-sm">
-                SPIO: spio1<br />
-                SPIO Contact: 78109110469
-            </p>
-
-            <q-separator class="q-my-md" />
-
-            <p class="text-subtitle2">Department chhanna hi i lungawi lo em?</p>
-
-            <q-btn
-                color="orange"
-                label="Do you want to apply for 1st Appeal?"
-                @click="applyFirstAppeal"
-            />
-        </q-card-section>
-    </q-card>
-
-<!--    First Appeal Question-->
-    <q-card class="mt-4">
+    <!-- Answer-->
+    <SPIO v-if="info.spio_answer" :info="info"/>
+    <!--    First Appeal Question-->
+    <q-card class="mt-4" v-if="info.first_appeal_citizen_question">
         <q-card-section>
             <div class="text-h6 text-purple-600">First Appeal Question</div>
         </q-card-section>
@@ -45,50 +13,18 @@
                 readonly
                 type="textarea"
                 label="Question / Zawhna"
-                v-model="answer"
+                v-model="info.first_appeal_citizen_question"
                 class="bg-grey-2"
                 autogrow
             />
-            <p class="text-subtitle2 q-mt-sm">Submitted on: 26th Aug, 24 11:50:47 am</p>
+            <p class="text-subtitle2 q-mt-sm">Submitted on: {{ info.first_appeal_daa_in }}</p>
 
         </q-card-section>
     </q-card>
     <!--    First Appeal Answer-->
-    <q-card class="mt-4">
-        <q-card-section>
-            <div class="text-h6 text-purple-600">First Appeal Answer</div>
-        </q-card-section>
-
-        <q-card-section>
-            <q-input
-                filled
-                readonly
-                type="textarea"
-                label="Answer"
-                v-model="answer"
-                class="bg-grey-2"
-                autogrow
-            />
-            <p class="text-subtitle2 q-mt-sm">Answered on: 26th Aug, 24 11:50:47 am</p>
-            <p class="text-subtitle2 q-mt-sm">
-                DAA: daa1<br />
-                DAA Contact: 78109110469
-            </p>
-
-            <q-separator class="q-my-md" />
-
-            <p class="text-subtitle2">Department chhanna hi i lungawi lo em?</p>
-
-            <q-btn
-                color="orange"
-                label="Do you want to apply for 2nd Appeal?"
-                @click="applySecondAppeal"
-            />
-        </q-card-section>
-    </q-card>
-
+    <DAA  v-if="info.first_appeal_daa_answer" :info="info"/>
     <!--    Second Appeal Question-->
-    <q-card class="mt-4">
+    <q-card class="mt-4" v-if="info.second_appeal_citizen_question">
         <q-card-section>
             <div class="text-h6 text-purple-600">Second Appeal Question</div>
         </q-card-section>
@@ -99,50 +35,27 @@
                 readonly
                 type="textarea"
                 label="Question / Zawhna"
-                v-model="answer"
+                v-model="info.second_appeal_citizen_question"
                 class="bg-grey-2"
                 autogrow
             />
-            <p class="text-subtitle2 q-mt-sm">Submitted on: 26th Aug, 24 11:50:47 am</p>
+            <p class="text-subtitle2 q-mt-sm">Submitted on: {{info.second_appeal_cic_in}}</p>
 
         </q-card-section>
     </q-card>
     <!--    Second Appeal Answer-->
-    <q-card class="mt-4">
-        <q-card-section>
-            <div class="text-h6 text-purple-600">Second Appeal Answer</div>
-        </q-card-section>
-
-        <q-card-section>
-            <q-input
-                filled
-                readonly
-                type="textarea"
-                label="Answer"
-                v-model="answer"
-                class="bg-grey-2"
-                autogrow
-            />
-            <p class="text-subtitle2 q-mt-sm">Answered on: 26th Aug, 24 11:50:47 am</p>
-
-
-            <q-separator class="q-my-md" />
-
-
-        </q-card-section>
-    </q-card>
+    <CIC  v-if="info.second_appeal_cic_answer" :info="info"/>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import SPIO from "@/Components/Citizen/Information/Answer/SPIO.vue";
+import DAA from "@/Components/Citizen/Information/Answer/DAA.vue";
+import CIC from "@/Components/Citizen/Information/Answer/CIC.vue";
 
-const answer = ref('No Answer (Computer Generated)')
 
-const applyFirstAppeal = () => {
-    console.log('Apply for 1st Appeal')
-}
+const props = defineProps(['info']);
 
-const applySecondAppeal = () => {
-    console.log('Apply for 1st Appeal')
-}
+
+
+
 </script>

@@ -4,6 +4,9 @@ import Detail from "@/Components/Citizen/Information/Detail.vue";
 import Answer from "@/Components/Citizen/Information/Answer.vue";
 defineOptions({ layout: BackendLayout });
 
+const props = defineProps({
+    info: Object,
+})
 </script>
 
 <template>
@@ -11,12 +14,12 @@ defineOptions({ layout: BackendLayout });
         <div class="row q-col-gutter-md">
             <!-- Detail Section -->
             <div class="col-12 col-md-6">
-                <Detail />
+                <Detail :info="info" />
             </div>
 
             <!-- Answer Section -->
             <div class="col-12 col-md-6">
-                <Answer />
+                <Answer :info="info"/>
             </div>
         </div>
     </q-page>

@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
+use App\Models\Information;
 use App\Models\LocalCouncil;
+use App\Models\PaidAttachment;
+use App\Models\PrePaymentAttachment;
 use App\Repositories\InformationRepository;
 
 use App\Traits\CanPay;
@@ -12,7 +15,6 @@ use Inertia\Inertia;
 
 class CitizenInformationController extends Controller
 {
-
 
     use CanPay;
     private InformationRepository $informationRepository;
@@ -46,8 +48,10 @@ class CitizenInformationController extends Controller
     }
     public function getLocalCouncil(Request $request){
 
-
         $councils = LocalCouncil::where('district', $request->district)
+            ->whereHas('users', function ($query) {
+                $query->where('bio', 'spio')->where('status', 'Accept');
+            })
             ->orderBy('name')
             ->get(['id', 'name']);
 
@@ -57,8 +61,8 @@ class CitizenInformationController extends Controller
     public function store(Request $request){
 
         $request->validate([
-            'department' => ['required_without:local_council', 'exists:departments,id'],
-            'local_council' => ['nullable', 'exists:local_councils,id'],
+            'department' => [ 'nullable'],
+            'local_council' => ['nullable'],
             'question' => ['required', 'string'],
             'life_or_death' => ['required'],
             'attachment' => ['nullable', 'array'],
@@ -82,10 +86,27 @@ class CitizenInformationController extends Controller
         ]);
 
     }
+    public function show(Information $info){
 
+        $info->load(['department', 'local_council','paidAttachments']);
 
-    public function show(){
-        return Inertia::render('Backend/Citizen/Information/Show',[]);
+        return Inertia::render('Backend/Citizen/Information/Show',[
+            'info' => $info
+        ]);
+    }
+
+    public function payAttachment(PaidAttachment $attachment){
+
+        dd($attachment);
+        $amount = $attachment->amount;
+        $razorpayOrder=$this->initiatePaymentAttachment($amount);
+
+        $prePaymentAttachment = new PrePaymentAttachment();
+        $prePaymentAttachment->information_id = $attachment->information_id;
+        $prePaymentAttachment->order_id = $razorpayOrder['receipt'];
+
+        $prePaymentAttachment->save();
+
     }
 
 

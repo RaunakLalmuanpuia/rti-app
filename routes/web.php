@@ -46,7 +46,9 @@ Route::group(['middleware' => 'auth', 'prefix' => 'citizen'], function () {
     Route::get('search-department',[CitizenInformationController::class,'searchDepartment'])->name('information.search-department');
     Route::get('get-local_council',[CitizenInformationController::class,'getLocalCouncil'])->name('information.get-local_council');
     Route::post('store', [CitizenInformationController::class, 'store'])->name('information.store');
-    Route::get('show', [CitizenInformationController::class, 'show'])->name('information.show');
+    Route::get('show/{info}', [CitizenInformationController::class, 'show'])->name('information.show');
+    Route::post('pay-attachment/{$attachment}', [CitizenInformationController::class, 'payAttachment'])->name('information.pay-attachment');
+
 });
 
 
