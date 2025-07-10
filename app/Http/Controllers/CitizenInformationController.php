@@ -97,15 +97,22 @@ class CitizenInformationController extends Controller
 
     public function payAttachment(PaidAttachment $attachment){
 
-        dd($attachment);
         $amount = $attachment->amount;
         $razorpayOrder=$this->initiatePaymentAttachment($amount);
 
         $prePaymentAttachment = new PrePaymentAttachment();
         $prePaymentAttachment->information_id = $attachment->information_id;
-        $prePaymentAttachment->order_id = $razorpayOrder['receipt'];
+        $prePaymentAttachment->order_id = $razorpayOrder['id'];
 
         $prePaymentAttachment->save();
+
+        return response()->json([
+            'order_id' => $razorpayOrder['id'],
+            'amount' => $razorpayOrder['amount'],
+            'currency' => $razorpayOrder['currency'],
+            'receipt' => $razorpayOrder['receipt'],
+            'key' => env('RAZORPAY_KEY_ID')
+        ]);
 
     }
 

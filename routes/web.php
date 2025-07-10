@@ -47,14 +47,15 @@ Route::group(['middleware' => 'auth', 'prefix' => 'citizen'], function () {
     Route::get('get-local_council',[CitizenInformationController::class,'getLocalCouncil'])->name('information.get-local_council');
     Route::post('store', [CitizenInformationController::class, 'store'])->name('information.store');
     Route::get('show/{info}', [CitizenInformationController::class, 'show'])->name('information.show');
-    Route::post('pay-attachment/{$attachment}', [CitizenInformationController::class, 'payAttachment'])->name('information.pay-attachment');
+    Route::post('pay-attachment/{attachment}', [CitizenInformationController::class, 'payAttachment'])->name('information.pay-attachment');
 
 });
 
 
 //Payment Callback
 Route::group(['prefix'=>'callback'], function () {
-    Route::post('information', [PaymentCallbackController::class, 'callback'])->name('callback.information');
+    Route::post('information', [PaymentCallbackController::class, 'information'])->name('callback.information');
+    Route::post('attachment', [PaymentCallbackController::class, 'attachment'])->name('callback.attachment');
 });
 
 
