@@ -7,13 +7,6 @@ use Razorpay\Api\Api;
 
 trait CanPay
 {
-    private $api;
-
-    public function __construct()
-    {
-        $this->api = new Api(env('RAZORPAY_KEY_ID'), env('RAZORPAY_KEY_SECRET'));
-    }
-
     public function initiatePayment(){
 
         $d = Carbon::now()->timestamp; // Produces something like 1552296328
@@ -42,17 +35,6 @@ trait CanPay
 
         throw new \Exception($razorpayOrder['error']['description'],500);
     }
-
-    public function verifyPayment($paymentId){
-
-        $api = new Api(env('RAZORPAY_KEY_ID'), env('RAZORPAY_KEY_SECRET'));
-
-        $data = $api->payment->fetch($paymentId);
-
-        return $data;
-
-    }
-
     public function initiatePaymentAttachment($amount){
         $d = Carbon::now()->timestamp; // Produces something like 1552296328
 
@@ -78,6 +60,15 @@ trait CanPay
         }
 
         throw new \Exception($razorpayOrder['error']['description'],500);
+
+    }
+    public function verifyPayment($paymentId){
+
+        $api = new Api(env('RAZORPAY_KEY_ID'), env('RAZORPAY_KEY_SECRET'));
+
+        $data = $api->payment->fetch($paymentId);
+
+        return $data;
 
     }
 }

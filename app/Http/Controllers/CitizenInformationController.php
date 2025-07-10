@@ -112,8 +112,10 @@ class CitizenInformationController extends Controller
             'key' => env('RAZORPAY_KEY_ID')
         ]);
     }
-
     public function firstAppeal(Request $request){
+
+    }
+    public function secondAppeal(Request $request){
 
     }
 
