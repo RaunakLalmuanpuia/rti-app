@@ -171,10 +171,6 @@ defineOptions({ layout: BackendLayout });
 const page = usePage()
 const user = computed(() => page.props.auth.user)
 
-const props = defineProps({
-    razorpayKey: String
-})
-
 const $q = useQuasar()
 
 const form = useForm({
@@ -305,8 +301,8 @@ const submitForm=e=>{
                     'Content-Type': 'multipart/form-data'
                 }
             }).then(res=>{
-                const {order_id,amount,currency, receipt} = res.data;
-                initRazorpay({order_id,amount,currency,receipt})
+                const {order_id,amount,currency, receipt,key} = res.data;
+                initRazorpay({order_id,amount,currency,receipt,key})
             }).catch(err=>{
                 console.log(err.response.data)
                 $q.notify({type:'negative',message:err?.response?.data?.message || err.toString()});
@@ -325,7 +321,7 @@ const initRazorpay = data => {
 
     try {
         const options = {
-            key: props.razorpayKey,
+            key: data.key,
             amount: data.amount,
             currency: data.currency,
             name: 'MIC Mizoram',

@@ -25,9 +25,7 @@ class CitizenInformationController extends Controller
     }
     public function create(){
 
-        return Inertia::render('Backend/Citizen/Information/Create',[
-            'razorpayKey' => env('RAZORPAY_KEY_ID')
-        ]);
+        return Inertia::render('Backend/Citizen/Information/Create');
     }
     public function searchDepartment(Request $request)
     {
@@ -83,6 +81,7 @@ class CitizenInformationController extends Controller
             'amount' => $razorpayOrder['amount'],
             'currency' => $razorpayOrder['currency'],
             'receipt' => $razorpayOrder['receipt'],
+            'key' => env('RAZORPAY_KEY_ID')
         ]);
 
     }
@@ -94,7 +93,6 @@ class CitizenInformationController extends Controller
             'info' => $info
         ]);
     }
-
     public function payAttachment(PaidAttachment $attachment){
 
         $amount = $attachment->amount;
@@ -113,6 +111,9 @@ class CitizenInformationController extends Controller
             'receipt' => $razorpayOrder['receipt'],
             'key' => env('RAZORPAY_KEY_ID')
         ]);
+    }
+
+    public function firstAppeal(Request $request){
 
     }
 

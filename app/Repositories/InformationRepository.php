@@ -171,4 +171,8 @@ class InformationRepository
 
     }
 
+    public function storeFirstAppeal($request){
+
+    }
+
 }
