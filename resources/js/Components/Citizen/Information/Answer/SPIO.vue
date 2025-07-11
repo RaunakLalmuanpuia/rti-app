@@ -90,12 +90,47 @@
             </template>
         </q-card-section>
     </q-card>
+
+    <q-card v-if="showAppealCard" class="q-mt-md">
+        <q-card-section>
+            <q-input
+                filled
+                v-model="form.appeal_reason"
+                type="textarea"
+                rows="6"
+                label="Question / Zawhna"
+                placeholder="Type your questions here"
+            />
+            <q-file
+                filled
+                v-model="form.attachment"
+                label="Attach Document (optional)"
+                accept=".jpg, .jpeg, .png, .pdf"
+                class="q-mt-md"
+                multiple
+            />
+            <q-checkbox
+                v-model="confirmChecked"
+                label="I confirm that the above information is correct"
+                class="q-mt-md"
+            />
+
+            <q-separator class="q-my-md" />
+
+            <q-btn
+                    color="orange"
+                    label="Submit for 1st Appeal"
+                    @click="submitFirstAppeal"
+                />
+
+        </q-card-section>
+    </q-card>
 </template>
 
 <script setup>
 
-import {usePage} from "@inertiajs/vue3";
-import {computed, onMounted} from "vue";
+import {usePage,useForm} from "@inertiajs/vue3";
+import {ref,computed, onMounted} from "vue";
 import axios from "axios";
 import {useQuasar} from "quasar";
 const page = usePage()
@@ -104,11 +139,64 @@ const user = computed(() => page.props.auth.user)
 const props = defineProps(['info']);
 const $q = useQuasar()
 
+const showAppealCard = ref(false)
+
+const form = useForm({
+    appeal_reason: '',
+    attachment: null,
+})
+const confirmChecked = ref(false)
 
 const applyFirstAppeal = () => {
+    showAppealCard.value = true
     console.log('Apply for 1st Appeal')
 }
 
+// Submit with confirmation
+const submitFirstAppeal = () => {
+
+    if (!confirmChecked.value) {
+        $q.notify({
+            type: 'warning',
+            message: 'You must confirm before submitting the appeal.'
+        })
+        return
+    }
+
+    if (!form.appeal_reason) {
+        $q.notify({
+            type: 'negative',
+            message: 'Appeal reason must be at least 20 characters.'
+        })
+        return
+    }
+
+    $q.dialog({
+        title: 'Confirm Submission',
+        message: 'Are you sure you want to submit the 1st Appeal?',
+        cancel: true,
+        persistent: true
+    }).onOk(() => {
+        form.post(route('information.first-appeal', props.info), {
+            forceFormData: true,
+            onSuccess: () => {
+                $q.notify({
+                    type: 'positive',
+                    message: '1st Appeal submitted successfully.'
+                })
+                showAppealCard.value = false
+                form.reset()
+                confirmChecked.value = false
+            },
+            onError: () => {
+                $q.notify({
+                    type: 'negative',
+                    message: 'Submission failed. Please check the form.'
+                })
+            }
+        })
+    })
+}
 const payNow=e=>{
     $q.dialog({
         title:'Confirmation',

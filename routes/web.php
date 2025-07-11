@@ -48,7 +48,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'citizen'], function () {
     Route::post('store', [CitizenInformationController::class, 'store'])->name('information.store');
     Route::get('show/{info}', [CitizenInformationController::class, 'show'])->name('information.show');
     Route::post('pay-attachment/{attachment}', [CitizenInformationController::class, 'payAttachment'])->name('information.pay-attachment');
-
+    Route::post('first-appeal/{information}', [CitizenInformationController::class, 'firstAppeal'])->name('information.first-appeal');
 });
 
 

@@ -14,9 +14,13 @@ class LocalCouncil extends Model
     protected $fillable = ['name'];
     protected $dates = ['deleted_at'];
 
+//    public function users()
+//    {
+//      return  $this->hasMany(User::class);
+//    }
     public function users()
     {
-      return  $this->hasMany(User::class);
+        return $this->hasMany(User::class, 'local_council', 'id');
     }
 
   public function informations()

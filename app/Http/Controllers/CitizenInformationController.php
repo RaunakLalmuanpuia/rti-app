@@ -112,7 +112,13 @@ class CitizenInformationController extends Controller
             'key' => env('RAZORPAY_KEY_ID')
         ]);
     }
-    public function firstAppeal(Request $request){
+    public function firstAppeal(Request $request, Information $information){
+
+        $validated = $request->validate([
+            'appeal_reason' => ['required', 'string', 'min:20', 'max:1000'],
+            'attachment' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
+        ]);
+        dd($validated['appeal_reason']);
 
     }
     public function secondAppeal(Request $request){
