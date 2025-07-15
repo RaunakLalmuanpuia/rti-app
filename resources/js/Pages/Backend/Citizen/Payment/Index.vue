@@ -2,6 +2,8 @@
 
 <template>
     <q-page class="q-pa-md">
+
+        <!-- Web Payment-->
         <div class="overflow-x-auto border border-t-0 border-gray-200 rounded-b-md">
             <div>Payment History From Website</div>
 
@@ -38,7 +40,7 @@
                     :key="payment.id"
                     :class="index % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
                 >
-                    <td class="border border-gray-300 px-3 py-2 align-top">{{ index }}</td>
+                    <td class="border border-gray-300 px-3 py-2 align-top">{{ index + 1 }}</td>
                     <td class="border border-gray-300 px-3 py-2 align-top">{{ payment.order_id }}</td>
                     <td class="border border-gray-300 px-3 py-2 align-top">{{ payment.tracking_id  }}</td>
                     <td class="border border-gray-300 px-3 py-2 align-top">{{ payment.order_status }}</td>
@@ -73,7 +75,7 @@
             </div>
         </div>
 
-
+        <!--Mobile Payment-->
         <div class="overflow-x-auto border border-t-0 mt-5 border-gray-200 rounded-b-md">
             <div>Payment History From Mobile Application</div>
 
@@ -84,7 +86,7 @@
                     @change="changePerPage"
                     class="border border-gray-300 rounded px-2 py-1 text-sm"
                 >
-                    <option v-for="n in [10, 25, 50, 100]" :key="n" :value="n">
+                    <option v-for="n in [ 10, 25, 50, 100]" :key="n" :value="n">
                         {{ n }}
                     </option>
                 </select>
@@ -123,7 +125,6 @@
                 </tbody>
             </table>
         </div>
-
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border border-t-0 border-gray-200 rounded-b-md px-4 py-3 text-sm text-gray-700">
             <div>
                 Showing {{ paytmPayments.from }} to {{ paytmPayments.to }} of {{ paytmPayments.total }} entries
@@ -185,8 +186,13 @@ const goToPage = (url) => {
     if (url) {
         router.visit(url, {
             preserveState: true,
-            replace: true
+            replace: true,
+            data: {
+                perPageWeb: state.perPageWeb,
+                perPageMobile: props.perPageMobile,
+            }
         })
+
     }
 }
 
