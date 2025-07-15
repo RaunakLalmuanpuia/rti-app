@@ -46,6 +46,7 @@ class PaymentCallbackController extends Controller
             $payment->order_id = $order_id;
             $payment->currency = "INR";
             $payment->amount = 10;
+            $payment->billing_name = Auth::user()->name;
 
             // Fetch payment details from Razorpay
             $data = $this->verifyPayment($payment_id);
@@ -144,7 +145,7 @@ class PaymentCallbackController extends Controller
             $payment->tracking_id = $payment_id;
             $payment->order_id = $order_id;
             $payment->currency = "INR";
-
+            $payment->billing_name = Auth::user()->name;
 
             // Fetch payment details from Razorpay
             $data = $this->verifyPayment($payment_id);

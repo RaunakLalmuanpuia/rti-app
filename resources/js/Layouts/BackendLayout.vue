@@ -21,8 +21,8 @@
                             <q-item clickable v-close-popup>
                                 <q-item-section>Profile</q-item-section>
                             </q-item>
-                            <q-item clickable v-close-popup>
-                                <q-item-section>Settings</q-item-section>
+                            <q-item @click="router.get(route('citizen.payment.index'))" clickable v-close-popup>
+                                <q-item-section>Payment History</q-item-section>
                             </q-item>
                             <q-separator />
                             <q-item clickable v-close-popup @click="logout">
@@ -109,7 +109,7 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { usePage } from '@inertiajs/vue3'
+import {router, usePage} from '@inertiajs/vue3'
 
 const page = usePage()
 const user = computed(() => page.props.auth.user)

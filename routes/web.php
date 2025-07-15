@@ -6,6 +6,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CitizenInformationController;
+use App\Http\Controllers\CitizenPaymentController;
 use App\Http\Controllers\PaymentCallbackController;
 
 Route::get('/', function () {
@@ -40,7 +41,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'dashboard'], function () {
 
 
 
-//Citizen
+//Citizen Information
 Route::group(['middleware' => 'auth', 'prefix' => 'citizen'], function () {
     Route::get('create',[CitizenInformationController::class,'create'])->name('information.create');
     Route::get('search-department',[CitizenInformationController::class,'searchDepartment'])->name('information.search-department');
@@ -52,6 +53,10 @@ Route::group(['middleware' => 'auth', 'prefix' => 'citizen'], function () {
     Route::post('second-appeal/{information}', [CitizenInformationController::class, 'secondAppeal'])->name('information.second-appeal');
 });
 
+// Citizen Payment
+Route::group(['middleware' => 'auth', 'prefix' => 'citizen'], function () {
+    Route::get('payment',[CitizenPaymentController::class,'index'])->name('citizen.payment.index');
+});
 
 //Payment Callback
 Route::group(['prefix'=>'callback'], function () {
