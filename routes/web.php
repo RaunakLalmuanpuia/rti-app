@@ -49,6 +49,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'citizen'], function () {
     Route::get('show/{info}', [CitizenInformationController::class, 'show'])->name('information.show');
     Route::post('pay-attachment/{attachment}', [CitizenInformationController::class, 'payAttachment'])->name('information.pay-attachment');
     Route::post('first-appeal/{information}', [CitizenInformationController::class, 'firstAppeal'])->name('information.first-appeal');
+    Route::post('second-appeal/{information}', [CitizenInformationController::class, 'secondAppeal'])->name('information.second-appeal');
 });
 
 

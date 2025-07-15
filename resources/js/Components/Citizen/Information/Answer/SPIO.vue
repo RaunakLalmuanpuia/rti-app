@@ -129,7 +129,7 @@
 
 <script setup>
 
-import {usePage,useForm} from "@inertiajs/vue3";
+import {usePage, useForm, router} from "@inertiajs/vue3";
 import {ref,computed, onMounted} from "vue";
 import axios from "axios";
 import {useQuasar} from "quasar";
@@ -148,13 +148,12 @@ const form = useForm({
 const confirmChecked = ref(false)
 
 const applyFirstAppeal = () => {
-    showAppealCard.value = true
+    showAppealCard.value = !showAppealCard.value
     console.log('Apply for 1st Appeal')
 }
 
 // Submit with confirmation
 const submitFirstAppeal = () => {
-
     if (!confirmChecked.value) {
         $q.notify({
             type: 'warning',
@@ -177,9 +176,19 @@ const submitFirstAppeal = () => {
         cancel: true,
         persistent: true
     }).onOk(() => {
-        form.post(route('information.first-appeal', props.info), {
-            forceFormData: true,
-            onSuccess: () => {
+        const fd = new FormData()
+        fd.append('appeal_reason', form.appeal_reason)
+
+        if (form.attachment && form.attachment.length) {
+            form.attachment.forEach((file, index) => {
+                fd.append(`attachment[${index}]`, file)
+            })
+        }
+
+        axios.post(route('information.first-appeal', props.info), fd, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+            .then(() => {
                 $q.notify({
                     type: 'positive',
                     message: '1st Appeal submitted successfully.'
@@ -187,16 +196,55 @@ const submitFirstAppeal = () => {
                 showAppealCard.value = false
                 form.reset()
                 confirmChecked.value = false
-            },
-            onError: () => {
-                $q.notify({
-                    type: 'negative',
-                    message: 'Submission failed. Please check the form.'
-                })
-            }
-        })
+                router.get(route('information.show', props.info))
+            })
+            .catch(error => {
+                if (error.response && error.response.status === 422) {
+                    const errors = error.response.data.errors
+                    const messages = []
+
+                    if (errors) {
+                        for (const field in errors) {
+                            if (errors[field]) {
+                                messages.push(...errors[field])
+                            }
+                        }
+
+                        $q.notify({
+                            type: 'negative',
+                            message: messages,
+                        })
+
+                        // $q.dialog({
+                        //     title: 'Validation Errors',
+                        //     message: messages.join('<br>'),
+                        //     html: true,
+                        //     persistent: true
+                        // })
+                    } else if (error.response.data.message) {
+
+                        $q.notify({
+                            type: 'negative',
+                            message: error.response.data.message,
+                        })
+                        // Custom error message (like DAA not found)
+
+                        // $q.dialog({
+                        //     title: 'Error',
+                        //     message: error.response.data.message,
+                        //     persistent: true
+                        // })
+                    }
+                } else {
+                    $q.notify({
+                        type: 'negative',
+                        message: 'System Error. Please try again later.'
+                    })
+                }
+            })
     })
 }
+
 const payNow=e=>{
     $q.dialog({
         title:'Confirmation',
@@ -264,7 +312,5 @@ onMounted(() => {
 })
 </script>
 
-
 <style scoped>
-
 </style>

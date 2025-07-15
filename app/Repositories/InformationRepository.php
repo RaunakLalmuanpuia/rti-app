@@ -176,11 +176,49 @@ class InformationRepository
         return true;
 
     }
-    public function storeFirstAppeal($request){
+    public function storeFirstAppeal($request, $information)
+    {
+        $now = Carbon::now();
 
+        $information->first_appeal_daa_in = $now;
+        $information->first_appeal_citizen_question = $request['appeal_reason'];
+
+        if($request['attachment']!=null){
+            $data =[];
+            foreach($request['attachment'] as $file){
+                $name = "1app".time().rand(1000,9999).'.'.$file->getClientOriginalExtension();
+                //    $file->move(public_path().'/files/', $name);
+                $file->move(storage_path('app/public').'/files/', $name);
+
+                $data[] = $name;
+            }
+            $information->first_appeal_citizen_question_file = implode(",",$data);//TURN THE ARRAY INTO STRING SEPERATE BY COMMA
+        }
+        $information->save();
+
+        return $information;
     }
-    public function storeSecondAppeal($request){
+    public function storeSecondAppeal($request, $information){
 
+
+        $now = Carbon::now();
+
+        $information->second_appeal_cic_in = $now;
+
+        $information->second_appeal_citizen_question = $request['appeal_reason'];
+        if($request['attachment']!=null){
+            $data =[];
+            foreach($request['attachment'] as $file){
+                $name = "2app".time().rand(1000,9999).'.'.$file->getClientOriginalExtension();
+                //    $file->move(public_path().'/files/', $name);
+                $file->move(storage_path('app/public').'/files/', $name);
+
+                $data[] = $name;
+            }
+            $information->second_appeal_citizen_question_file = implode(",",$data);//TURN THE ARRAY INTO STRING SEPERATE BY COMMA
+        }
+        $information->update();
+        return $information;
     }
 
 }

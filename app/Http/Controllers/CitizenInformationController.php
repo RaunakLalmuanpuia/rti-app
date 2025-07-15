@@ -7,10 +7,12 @@ use App\Models\Information;
 use App\Models\LocalCouncil;
 use App\Models\PaidAttachment;
 use App\Models\PrePaymentAttachment;
+use App\Models\User;
 use App\Repositories\InformationRepository;
 
 use App\Traits\CanPay;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class CitizenInformationController extends Controller
@@ -116,12 +118,131 @@ class CitizenInformationController extends Controller
 
         $validated = $request->validate([
             'appeal_reason' => ['required', 'string', 'min:20', 'max:1000'],
-            'attachment' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
+            'attachment' => ['nullable'],
+            'attachment.*' => ['file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
         ]);
-        dd($validated['appeal_reason']);
+
+        // Check if DAA is there if department
+        if ($information['citizen_question_department'] !== null){
+            //TAKE ALL THE DAA WHICH HAVE THE CONCERN DEPARTMENT
+            $mydaa = User::where('department','=',$information->citizen_question_department)->where('bio','=','daa')->where('status','Accept')->first();
+
+            if($mydaa==null){
+                $multiDaa = DB::table('users')->whereRaw('FIND_IN_SET(?,sex)',[$information->citizen_question_department])->where('bio','=','daa')->where('status','Accept')->first();
+
+                if($multiDaa!=null){
+                    $nameDaa=$multiDaa->name;
+                    $emailDaa=$multiDaa->email;
+                    $contactDaa=$multiDaa->contact;
+                }else{
+                    //no DAA
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'No DAA found for the concerned department.'
+                    ], 422);
+                }
+
+            }else{
+                $nameDaa=$mydaa->name;
+                $emailDaa=$mydaa->email;
+                $contactDaa=$mydaa->contact;
+            }
+        }
+        // Check if DAA is there if Local Council
+        if($information['citizen_question_locall_council'] !== null){
+
+            $lc = LocalCouncil::where('id','=', $information->citizen_question_locall_council)->first();
+            $district = $lc->district;
+            if ($district === 'Aizawl') {
+                $mydaa = User::where('bio', 'daa')
+                    ->where('status', 'Accept')
+                    ->whereHas('dept', function ($query) {
+                        $query->where('name', 'AMC(LC)');
+                    })
+                    ->first();
+
+                if($mydaa==null){
+                    return view("information.nodaa");
+                }else{
+                    $nameDaa=$mydaa->name;
+                    $emailDaa=$mydaa->email;
+                    $contactDaa=$mydaa->contact;
+                }
+            } else {
+                $mydaa = User::where('bio', 'daa')
+                    ->where('status', 'Accept')
+                    ->whereHas('dept', function ($query) {
+                        $query->where('name', 'LMC(LC)');
+                    })
+                    ->first();
+                if($mydaa==null){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'No DAA found for the concerned department.'
+                    ], 422);
+                }else{
+                    $nameDaa=$mydaa->name;
+                    $emailDaa=$mydaa->email;
+                    $contactDaa=$mydaa->contact;
+                }
+            }
+        }
+
+
+        // Send SMS to DAA
+//        try{
+//            $myMessage =  "First Appeal has been filed. Please visit ".$this->websiteLink." to response.";
+//            $templateId = "1407165390488786993";
+//            $this->thangteaSMS($contactDaa,$myMessage,$templateId);
+//            $this->email( $nameDaa,$emailDaa,$information->citizen_question);
+//        }catch(Exception $e){
+//            return redirect('information')->withError(trans('No DAA present'));
+//        }
+
+
+
+        // Store First Appeal
+        $firstAppeal =$this->repository->storeFirstAppeal($validated,$information);
+
+
+        return redirect()->back()->with('message','First Appeal Filled');
 
     }
-    public function secondAppeal(Request $request){
+    public function secondAppeal(Request $request, Information $information){
+
+        $validated = $request->validate([
+            'appeal_reason' => ['required', 'string', 'min:10', 'max:1000'],
+            'attachment' => ['nullable'],
+            'attachment.*' => ['file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
+        ]);
+
+
+//        $myCicList = User::where('bio','=','cic')->get();
+//
+//        $mContactArray = array();
+//        $mNameArray = array();
+//        $mEmailArray = array();
+//
+//        if($myCicList != null){
+//            foreach($myCicList as $mySpio){
+//                $mContactArray[] = $mySpio->contact;
+//                $mNameArray[] = $mySpio->name;
+//                $mEmailArray[] = $mySpio->email;
+//            }
+//            $myMessage =  "Second Appeal has been filed. Please visit ".$this->websiteLink." to response.";
+//            $templateId = "1407165390488786993";
+//            $this->thangteaSMS($mContactArray,$myMessage,$templateId);
+//            $this->email($mNameArray,$mEmailArray,$information->second_appeal_citizen_question_file);
+//        }
+//
+
+        // Store First Appeal
+        $secondAppeal =$this->repository->storeSecondAppeal($validated,$information);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Second Appeal filed successfully.'
+        ]);
 
     }
 
