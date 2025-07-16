@@ -73,9 +73,11 @@
                     <td class="border border-gray-300 px-3 py-2 align-top">{{ info.department?.name ?? info.local_council?.name  }}</td>
                     <td class="border border-gray-300 px-3 py-2 align-top">{{ formatDate(info.created_at) }}</td>
                     <td class="border border-gray-300 px-3 py-2 align-top">
-              <span class="bg-green-100 text-green-700 text-[10px] font-semibold px-2 py-[2px] rounded">
-                {{ info.status ?? 'Pending' }}
-              </span>
+                      <span
+                          class="text-[10px] font-semibold px-2 py-[2px] rounded"
+                          :class="getStatusClass(info)"
+                          v-html="getStatusLabel(info)"
+                      ></span>
                     </td>
                 </tr>
                 <tr v-if="information.data.length === 0">
@@ -168,4 +170,71 @@ const formatDate = (dateStr) => {
         hour12: true
     })
 }
+
+function getStatusLabel(info) {
+    if (info.complain) return 'Complaint Registered'
+
+    if (info.aspio_in && !info.spio_in) {
+        return 'Under process by SAPIO'
+    }
+
+    if (info.spio_in && !info.spio_out) {
+        return info.information_status == 11
+            ? '30 days has passed'
+            : 'Under process by SPIO'
+    }
+
+    if (info.spio_answer && !info.first_appeal_citizen_question && info.spio_out) {
+        return info.information_status == 11
+            ? '30 days has passed (SPIO)'
+            : 'Answered by SPIO'
+    }
+
+    if (info.first_appeal_citizen_question && !info.first_appeal_daa_answer) {
+        return 'Under process by DAA'
+    }
+
+    if (!info.second_appeal_citizen_question && info.first_appeal_daa_answer) {
+        return info.information_status == 22
+            ? '30 days has passed (DAA)'
+            : 'Answered by DAA'
+    }
+
+    if (info.second_appeal_citizen_question && !info.second_appeal_cic_answer) {
+        return 'Under process by CIC'
+    }
+
+    if (info.second_appeal_citizen_question && info.second_appeal_cic_answer) {
+        return 'Answered by CIC'
+    }
+
+    if (!info.aspio_answer && !info.aspio_in && info.spio_in && !info.spio_out) {
+        return 'Under process by SPIO'
+    }
+
+    if (!info.aspio_answer && !info.aspio_in && info.spio_in && info.spio_out) {
+        return 'Answered by SPIO'
+    }
+
+    return 'Pending'
+}
+
+function getStatusClass(info) {
+    const label = getStatusLabel(info).toLowerCase()
+
+    if (label.includes('under process')) {
+        return 'bg-red-100 text-red-600'
+    }
+    if (label.includes('answered')) {
+        return 'bg-green-100 text-green-700'
+    }
+    if (label.includes('30 days')) {
+        return 'bg-yellow-100 text-yellow-700'
+    }
+    if (label.includes('complaint')) {
+        return 'bg-purple-100 text-purple-700'
+    }
+    return 'bg-gray-100 text-gray-700'
+}
+
 </script>
