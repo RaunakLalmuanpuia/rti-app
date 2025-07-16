@@ -42,7 +42,7 @@ class LoginRequest extends FormRequest
         $this->ensureIsNotRateLimited();
 
         $login = $this->input('login');
-        $fieldType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'mobile';
+        $fieldType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'contact';
 
 
         if (! Auth::attempt([$fieldType => $login, 'password' => $this->input('password')], $this->boolean('remember'))) {

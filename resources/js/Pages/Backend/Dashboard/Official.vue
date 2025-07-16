@@ -1,5 +1,6 @@
 <script setup>
-
+import BackendLayout from "@/Layouts/BackendLayout.vue";
+defineOptions({ layout: BackendLayout });
 </script>
 
 <template>
