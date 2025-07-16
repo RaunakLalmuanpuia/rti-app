@@ -59,6 +59,7 @@
                     <th class="border border-gray-300 font-semibold px-3 py-2">Department</th>
                     <th class="border border-gray-300 font-semibold px-3 py-2">Submitted At</th>
                     <th class="border border-gray-300 font-semibold px-3 py-2">Status</th>
+                    <th class="border border-gray-300 font-semibold px-3 py-2">Time since submission</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -78,6 +79,16 @@
                           :class="getStatusClass(info)"
                           v-html="getStatusLabel(info)"
                       ></span>
+                    </td>
+                    <td class="border border-gray-300 px-3 py-2 align-top d-none d-sm-table-cell">
+
+                            <template v-if="getTimeStatus(info).image">
+                                <img :src="getTimeStatus(info).image" class="inline-block mr-1" />
+                            </template>
+                            <template v-if="getTimeStatus(info).text">
+                                {{ getTimeStatus(info).text }}
+                            </template>
+
                     </td>
                 </tr>
                 <tr v-if="information.data.length === 0">
@@ -237,4 +248,107 @@ function getStatusClass(info) {
     return 'bg-gray-100 text-gray-700'
 }
 
+function getTimeStatus(info) {
+
+    // console.log('Showing PENDING for info.id =', info.id)
+    // console.log('aspio_in:', info.aspio_in)
+    // console.log('aspio_answer:', info.aspio_answer)
+    // console.log('spio_in:', info.spio_in)
+    // console.log('spio_answer:', info.spio_answer)
+    // console.log('first_appeal_citizen_question:', info.first_appeal_citizen_question)
+    // console.log('first_appeal_daa_answer:', info.first_appeal_daa_answer)
+    // console.log('second_appeal_citizen_question:', info.second_appeal_citizen_question)
+    // console.log('second_appeal_cic_answer:', info.second_appeal_cic_answer)
+    const now = new Date()
+
+    const stages = [
+        {
+            field: 'aspio_in',
+            answered: info.aspio_answer != null,
+            condition: !info.aspio_answer && !info.spio_in && info.aspio_in,
+            outputType: 'image+text',
+        },
+        {
+            field: 'spio_in',
+            answered: info.spio_answer != null,
+            condition: !info.spio_answer && info.spio_in,
+            outputType: 'image+text',
+        },
+        {
+            field: 'spio_out',
+            answered: true,
+            condition: info.spio_answer && !info.first_appeal_citizen_question,
+            outputType: 'answered',
+        },
+        {
+            field: 'first_appeal_daa_in',
+            answered: info.first_appeal_daa_answer != null,
+            condition: info.first_appeal_citizen_question && !info.first_appeal_daa_answer,
+            outputType: 'image+text',
+        },
+        {
+            field: 'first_appeal_daa_out',
+            answered: true,
+            condition: info.first_appeal_daa_answer && !info.second_appeal_citizen_question,
+            outputType: 'answered',
+        },
+        {
+            field: 'second_appeal_cic_in',
+            answered: info.second_appeal_cic_answer != null,
+            condition: info.second_appeal_citizen_question && !info.second_appeal_cic_answer,
+            outputType: 'image+text',
+        },
+        {
+            field: 'second_appeal_cic_out',
+            answered: true,
+            condition: info.second_appeal_cic_answer,
+            outputType: 'answered',
+        },
+    ]
+
+    for (const stage of stages) {
+        const raw = info[stage.field]
+        if (stage.condition && raw) {
+            const date = new Date(raw)
+            if (isNaN(date)) return { image: null, text: 'Invalid date' }
+
+            const days = Math.floor((now - date) / (1000 * 60 * 60 * 24))
+
+            if (stage.outputType === 'answered') {
+                return {
+                    image: null,
+                    text: 'Answered at ' + formatDateTime(date),
+                }
+            }
+
+            return {
+                image: getBadgeImage(days),
+                text: days === 0 ? 'Today' : days === 1 ? '1 day ago' : `${days} days ago`,
+            }
+        }
+    }
+
+    return { image: null, text: 'Pending' } // fallback
+}
+
+function getBadgeImage(days) {
+    if (days <= 5) return '/images/one.png'
+    if (days <= 10) return '/images/two.png'
+    if (days <= 15) return '/images/three.png'
+    if (days <= 20) return '/images/four.png'
+    if (days <= 25) return '/images/five.png'
+    return '/images/six.png'
+}
+
+function formatDateTime(date) {
+    return date.toLocaleString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true,
+    })
+}
 </script>
