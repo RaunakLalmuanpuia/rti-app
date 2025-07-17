@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CitizenInformationController;
 use App\Http\Controllers\CitizenPaymentController;
 use App\Http\Controllers\PaymentCallbackController;
+use App\Http\Controllers\AspioController;
 
 Route::get('/', function () {
     return Inertia::render('Home');
@@ -40,7 +41,6 @@ Route::group(['middleware' => 'auth', 'prefix' => 'dashboard'], function () {
 });
 
 
-
 //Citizen Information
 Route::group(['middleware' => 'auth', 'prefix' => 'citizen'], function () {
     Route::get('create',[CitizenInformationController::class,'create'])->name('information.create');
@@ -64,4 +64,12 @@ Route::group(['prefix'=>'callback'], function () {
     Route::post('attachment', [PaymentCallbackController::class, 'attachment'])->name('callback.attachment');
 });
 
+//SPAIO
+Route::middleware(['auth'])->prefix('sapio')->group(function () {
+    Route::get('information', [AspioController::class,'index'])->name('sapio.information.index');
+    Route::get('/information/pending', [AspioController::class, 'pending'])->name('sapio.information.pending');
+    Route::get('/information/commented', [AspioController::class, 'commented'])->name('sapio.information.commented');
+    Route::get('information/{information}/show', [AspioController::class,'show'])->name('sapio.information.show');
+    Route::post('information/{information}/comment', [AspioController::class,'store'])->name('sapio.information.store');
+});
 

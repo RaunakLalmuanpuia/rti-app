@@ -15,9 +15,10 @@ import { createInertiaApp } from '@inertiajs/vue3'
 import {ZiggyVue} from "../../vendor/tightenco/ziggy/dist"
 import { Dialog, Loading, Notify, Quasar } from "quasar";
 
-
+const appName = import.meta.env.VITE_APP_NAME || 'RTI';
 
 createInertiaApp({
+    title: (title) => `${appName}`,
     resolve: name => {
         const pages = import.meta.glob('./Pages/**/*.vue', { eager: true })
         return pages[`./Pages/${name}.vue`]

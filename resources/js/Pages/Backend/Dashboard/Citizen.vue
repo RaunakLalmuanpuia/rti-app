@@ -70,7 +70,7 @@
                     @click="$inertia.get(route('information.show',info))"
                 >
                     <td class="border border-gray-300 px-3 py-2 align-top">{{ info.citizen_name }}</td>
-                    <td class="border border-gray-300 px-3 py-2 align-top">{{ info.citizen_question }}</td>
+                    {{ info.citizen_question.length > 50 ? info.citizen_question.slice(0, 50) + '...' : info.citizen_question }}
                     <td class="border border-gray-300 px-3 py-2 align-top">{{ info.department?.name ?? info.local_council?.name  }}</td>
                     <td class="border border-gray-300 px-3 py-2 align-top">{{ formatDate(info.created_at) }}</td>
                     <td class="border border-gray-300 px-3 py-2 align-top">
