@@ -8,10 +8,9 @@ use App\Models\LocalCouncil;
 use App\Models\PrePayment;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+
 use Intervention\Image\Facades\Image;
 class InformationRepository
 {
@@ -180,7 +179,6 @@ class InformationRepository
         return $information;
     }
     public function storeSecondAppeal($request, $information){
-
 
         $now = Carbon::now();
 

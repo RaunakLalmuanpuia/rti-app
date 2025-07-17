@@ -199,7 +199,7 @@ const submitFirstAppeal = () => {
                 router.get(route('information.show', props.info))
             })
             .catch(error => {
-                if (error.response && error.response.status === 422) {
+                if (error.response) {
                     const errors = error.response.data.errors
                     const messages = []
 
@@ -215,25 +215,12 @@ const submitFirstAppeal = () => {
                             message: messages,
                         })
 
-                        // $q.dialog({
-                        //     title: 'Validation Errors',
-                        //     message: messages.join('<br>'),
-                        //     html: true,
-                        //     persistent: true
-                        // })
                     } else if (error.response.data.message) {
 
                         $q.notify({
                             type: 'negative',
                             message: error.response.data.message,
                         })
-                        // Custom error message (like DAA not found)
-
-                        // $q.dialog({
-                        //     title: 'Error',
-                        //     message: error.response.data.message,
-                        //     persistent: true
-                        // })
                     }
                 } else {
                     $q.notify({
@@ -283,6 +270,7 @@ const initRazorpay = data => {
             name: 'MIC Mizoram',
             description: 'RTI Attachment Payment',
             order_id: data.order_id,
+            image: "https://rti.mizoram.gov.in/images/logo2.png",
             callback_url : route('callback.attachment'),
             // handler: function (response) {
             //     // This runs after successful payment

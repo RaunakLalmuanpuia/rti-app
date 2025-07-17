@@ -328,6 +328,8 @@ const initRazorpay = data => {
             description: 'RTI Payment',
             order_id: data.order_id,
             callback_url : route('callback.information'),
+            image: "https://rti.mizoram.gov.in/images/logo2.png",
+
             // handler: function (response) {
             //     // This runs after successful payment
             //     console.log('Payment successful', response)

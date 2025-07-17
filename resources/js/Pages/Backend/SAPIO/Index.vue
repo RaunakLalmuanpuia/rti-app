@@ -1,16 +1,3 @@
-<script setup>
-import { ref } from 'vue';
-import { QTabs, QTab, QTabPanels, QTabPanel } from 'quasar';
-
-import BackendLayout from "@/Layouts/BackendLayout.vue";
-import Application from "@/Components/SAPIO/Information/Application.vue";
-import Commented from "@/Components/SAPIO/Information/Commented.vue";
-
-defineOptions({ layout: BackendLayout });
-
-const tab = ref('application');
-</script>
-
 <template>
     <div class="q-pa-md">
         <div class="text-h6 mb-4">SAPIO INFORMATION INDEX</div>
@@ -40,6 +27,19 @@ const tab = ref('application');
         </q-tab-panels>
     </div>
 </template>
+
+<script setup>
+import { ref } from 'vue';
+import { QTabs, QTab, QTabPanels, QTabPanel } from 'quasar';
+
+import BackendLayout from "@/Layouts/BackendLayout.vue";
+import Application from "@/Components/SAPIO/Information/Application.vue";
+import Commented from "@/Components/SAPIO/Information/Commented.vue";
+
+defineOptions({ layout: BackendLayout });
+
+const tab = ref('application');
+</script>
 
 <style scoped>
 .text-h6 {

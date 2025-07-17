@@ -1,14 +1,3 @@
-<script setup>
-import BackendLayout from "@/Layouts/BackendLayout.vue";
-import Detail from "@/Components/SAPIO/Detail.vue";
-import Answer from "@/Components/SAPIO/Answer.vue";
-defineOptions({ layout: BackendLayout });
-
-const props = defineProps({
-    info: Object,
-})
-</script>
-
 <template>
     <q-page class="q-pa-md">
         <div class="row q-col-gutter-md">
@@ -24,3 +13,14 @@ const props = defineProps({
         </div>
     </q-page>
 </template>
+
+<script setup>
+import BackendLayout from "@/Layouts/BackendLayout.vue";
+import Detail from "@/Components/SAPIO/Detail.vue";
+import Answer from "@/Components/SAPIO/Answer.vue";
+defineOptions({ layout: BackendLayout });
+
+const props = defineProps({
+    info: Object,
+})
+</script>

@@ -16,7 +16,7 @@ use Inertia\Inertia;
 class AspioController extends Controller
 {
     //
-    private InformationRepository $informationRepository;
+    private $repository;
 
     public function __construct(InformationRepository $informationRepository)
     {
@@ -99,18 +99,17 @@ class AspioController extends Controller
         ]);
     }
     public function store(Request $request, Information $information){
-//        dd($information);
         $validated = $request->validate([
             'comment' => ['required', 'string', 'min:10', 'max:1000'],
         ]);
 
         $mySpioList = User::where('department',$information->citizen_question_department)->where('bio','spio')->where('status','Accept')->get();
 
-        abort_if(blank($mySpioList),422,'No SPIO Registered');
+        abort_if(blank($mySpioList),500,'No SPIO Registered');
 
         $comment=$this->repository->storeComment($validated['comment'],$information);
 
-        abort_if(blank($comment),422,'Something Went Wrong');
+        abort_if(blank($comment),500,'Something Went Wrong');
 
         // Notify SPIO Application received
 

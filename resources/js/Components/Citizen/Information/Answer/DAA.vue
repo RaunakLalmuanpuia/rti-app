@@ -165,7 +165,7 @@ const submitSecondAppeal = () => {
                 router.get(route('information.show', props.info))
             })
             .catch(error => {
-                if (error.response && error.response.status === 422) {
+                if (error.response) {
                     const errors = error.response.data.errors
                     const messages = []
 
@@ -181,12 +181,6 @@ const submitSecondAppeal = () => {
                             message: messages,
                         })
 
-                        // $q.dialog({
-                        //     title: 'Validation Errors',
-                        //     message: messages.join('<br>'),
-                        //     html: true,
-                        //     persistent: true
-                        // })
                     } else if (error.response.data.message) {
                         // Custom error message (like DAA not found)
 

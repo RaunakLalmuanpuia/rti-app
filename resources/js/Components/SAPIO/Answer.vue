@@ -142,7 +142,7 @@ const submitComment = () => {
                 router.get(route('sapio.information.show', props.info))
             })
             .catch(error => {
-                if (error.response && error.response.status === 422) {
+                if (error.response) {
                     const errors = error.response.data.errors
                     const messages = []
                     if (errors) {

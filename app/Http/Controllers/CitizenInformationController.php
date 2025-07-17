@@ -136,10 +136,7 @@ class CitizenInformationController extends Controller
                     $contactDaa=$multiDaa->contact;
                 }else{
                     //no DAA
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'No DAA found for the concerned department.'
-                    ], 422);
+                    abort(500,'No DAA found for the concerned department');
                 }
 
             }else{
@@ -150,7 +147,6 @@ class CitizenInformationController extends Controller
         }
         // Check if DAA is there if Local Council
         if($information['citizen_question_locall_council'] !== null){
-
             $lc = LocalCouncil::where('id','=', $information->citizen_question_locall_council)->first();
             $district = $lc->district;
             if ($district === 'Aizawl') {
@@ -160,9 +156,8 @@ class CitizenInformationController extends Controller
                         $query->where('name', 'AMC(LC)');
                     })
                     ->first();
-
                 if($mydaa==null){
-                    return view("information.nodaa");
+                    abort(500,'No DAA found for the concerned Local Council');
                 }else{
                     $nameDaa=$mydaa->name;
                     $emailDaa=$mydaa->email;
@@ -176,10 +171,7 @@ class CitizenInformationController extends Controller
                     })
                     ->first();
                 if($mydaa==null){
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'No DAA found for the concerned department.'
-                    ], 422);
+                    abort(500,'No DAA found for the concerned Local Council');
                 }else{
                     $nameDaa=$mydaa->name;
                     $emailDaa=$mydaa->email;
@@ -187,8 +179,6 @@ class CitizenInformationController extends Controller
                 }
             }
         }
-
-
         // Send SMS to DAA
 //        try{
 //            $myMessage =  "First Appeal has been filed. Please visit ".$this->websiteLink." to response.";
@@ -198,8 +188,6 @@ class CitizenInformationController extends Controller
 //        }catch(Exception $e){
 //            return redirect('information')->withError(trans('No DAA present'));
 //        }
-
-
 
         // Store First Appeal
         $firstAppeal =$this->repository->storeFirstAppeal($validated,$information);
