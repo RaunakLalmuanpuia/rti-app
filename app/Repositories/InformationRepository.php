@@ -56,25 +56,6 @@ class InformationRepository
 
                 $data[] = $name;
 
-//                $imageExtensions = ['jpg', 'jpeg', 'gif', 'png', 'bmp', 'svg', 'svgz', 'cgm', 'djv', 'djvu', 'ico', 'ief', 'jpe', 'pbm', 'pgm', 'pnm', 'ppm', 'ras', 'rgb', 'tif', 'tiff', 'wbmp', 'xbm', 'xpm', 'xwd'];
-//                $extension = $file->getClientOriginalExtension();
-//
-//                if (in_array($extension, $imageExtensions)) {
-//                    $imageResize = Image::make($file);
-//                    $name = "file" . time() . rand(1000, 9999) . '.' . 'jpeg';
-//                    // $path = public_path()."/files"."/".$name;
-//                    $path = storage_path('app/public') . "/files" . "/" . $name;
-//
-//                    $imageResize->save($path, 50, 'jpg');
-//                    $data[] = $name;
-//                } else {
-//                    // Is not Image
-//                    $name = "file" . time() . rand(1000, 9999) . '.' . $file->getClientOriginalExtension();
-//                    // $file->move(public_path().'/files/', $name);
-//                    $file->move(storage_path('app/public') . '/files/', $name);
-//
-//                    $data[] = $name;
-//                }
             }
             $prePayment->citizen_question_file = implode(",", $data); //TURN THE ARRAY INTO STRING SEPERATE BY COMMA
         }
@@ -218,6 +199,24 @@ class InformationRepository
             $information->second_appeal_citizen_question_file = implode(",",$data);//TURN THE ARRAY INTO STRING SEPERATE BY COMMA
         }
         $information->update();
+        return $information;
+    }
+
+    public function storeComment($comment, $information){
+
+        $now = Carbon::now();
+        $user = Auth::user();
+
+        $information->aspio_answer = $comment;
+        $information->aspio_id = $user->id;
+
+        $information->aspio_name = $user->name;
+        $information->aspio_contact = $user->contact;
+        $information->aspio_email = $user->email;
+
+        $information->spio_in = $now;
+        $information->update();
+
         return $information;
     }
 

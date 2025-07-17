@@ -67,8 +67,8 @@ Route::group(['prefix'=>'callback'], function () {
 //SPAIO
 Route::middleware(['auth'])->prefix('sapio')->group(function () {
     Route::get('information', [AspioController::class,'index'])->name('sapio.information.index');
-    Route::get('/information/pending', [AspioController::class, 'pending'])->name('sapio.information.pending');
-    Route::get('/information/commented', [AspioController::class, 'commented'])->name('sapio.information.commented');
+    Route::get('/information/pending', [AspioController::class, 'pendingJson'])->name('sapio.information.pending');
+    Route::get('/information/commented', [AspioController::class, 'commentedJson'])->name('sapio.information.commented');
     Route::get('information/{information}/show', [AspioController::class,'show'])->name('sapio.information.show');
     Route::post('information/{information}/comment', [AspioController::class,'store'])->name('sapio.information.store');
 });

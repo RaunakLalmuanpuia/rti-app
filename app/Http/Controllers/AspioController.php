@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 
 
 use App\Models\Information;
+use App\Models\User;
+use App\Repositories\InformationRepository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,13 +16,19 @@ use Inertia\Inertia;
 class AspioController extends Controller
 {
     //
+    private InformationRepository $informationRepository;
+
+    public function __construct(InformationRepository $informationRepository)
+    {
+        $this->repository = $informationRepository;
+    }
     public function index(Request $request){
 
         return Inertia::render('Backend/SAPIO/Index');
 
     }
 
-    public function pending(Request $request){
+    public function pendingJson(Request $request){
 
         $search = $request->input('filter');
         $perPage = $request->input('rowsPerPage', 15);
@@ -28,6 +36,7 @@ class AspioController extends Controller
 
         $query = Information::with('department')
             ->where('citizen_question_department', $userDepartmentId)
+            ->whereNull('aspio_answer')
             ->whereNull('complain')
             ->whereNull('transfer');
 
@@ -51,7 +60,7 @@ class AspioController extends Controller
         ]);
 
     }
-    public function commented(Request $request){
+    public function commentedJson(Request $request){
 
         $search = $request->input('filter');
         $perPage = $request->input('rowsPerPage', 15);
@@ -84,14 +93,31 @@ class AspioController extends Controller
     }
 
     public function show(Information $information){
-//        dd($information);
         $information->load(['department','local_council','paidAttachments']);
-
         return Inertia::render('Backend/SAPIO/Show',[
             'info' => $information
         ]);
     }
     public function store(Request $request, Information $information){
+//        dd($information);
+        $validated = $request->validate([
+            'comment' => ['required', 'string', 'min:10', 'max:1000'],
+        ]);
+
+        $mySpioList = User::where('department',$information->citizen_question_department)->where('bio','spio')->where('status','Accept')->get();
+
+        abort_if(blank($mySpioList),422,'No SPIO Registered');
+
+        $comment=$this->repository->storeComment($validated['comment'],$information);
+
+        abort_if(blank($comment),422,'Something Went Wrong');
+
+        // Notify SPIO Application received
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Comment saved successfully.'
+        ]);
 
     }
 }
