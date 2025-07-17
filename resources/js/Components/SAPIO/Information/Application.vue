@@ -1,5 +1,4 @@
 <template>
-    <div>Pending</div>
     <!-- Filters: Per Page & Search -->
     <div
         class="flex flex-col sm:flex-row sm:items-center sm:justify-between border border-gray-200 rounded-t-md px-2 py-1"

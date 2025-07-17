@@ -3,12 +3,12 @@ import { ref } from 'vue';
 import { QTabs, QTab, QTabPanels, QTabPanel } from 'quasar';
 
 import BackendLayout from "@/Layouts/BackendLayout.vue";
-import Pending from "@/Components/SAPIO/Information/Pending.vue";
+import Application from "@/Components/SAPIO/Information/Application.vue";
 import Commented from "@/Components/SAPIO/Information/Commented.vue";
 
 defineOptions({ layout: BackendLayout });
 
-const tab = ref('pending');
+const tab = ref('application');
 </script>
 
 <template>
@@ -24,14 +24,14 @@ const tab = ref('pending');
             indicator-color="primary"
             class="q-mb-md"
         >
-            <q-tab name="pending" label="Pending" />
+            <q-tab name="application" label="Application" />
             <q-tab name="commented" label="Commented" />
         </q-tabs>
 
         <!-- Tab Panels -->
         <q-tab-panels v-model="tab" animated>
-            <q-tab-panel name="pending">
-                <Pending />
+            <q-tab-panel name="application">
+                <Application />
             </q-tab-panel>
 
             <q-tab-panel name="commented">

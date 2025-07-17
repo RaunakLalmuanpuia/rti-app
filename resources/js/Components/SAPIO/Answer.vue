@@ -1,5 +1,5 @@
 <template>
-    <q-card v-if="!info.aspio_answer">
+    <q-card v-if="!info.aspio_answer && !info.spio_answer">
         <q-card-section class="row items-center justify-between">
             <div class="text-h6 text-primary">Comment</div>
         </q-card-section>
@@ -29,7 +29,8 @@
         <q-card-section class="row items-center justify-between">
             <div class="text-h6 text-purple-600">SAPIO Comment</div>
         </q-card-section>
-        <q-card-section>
+
+        <q-card-section v-if="info.aspio_answer">
             <q-input
                 filled
                 readonly
@@ -46,12 +47,67 @@
             </p>
 
         </q-card-section>
+
+        <q-card-section v-if="!info.aspio_answer">
+            <q-input
+                filled
+                readonly
+                type="textarea"
+                label="No Comment"
+                v-model="info.aspio_answer"
+                class="bg-grey-2"
+                rows="6"
+            />
+        </q-card-section>
+    </q-card>
+
+    <q-card class="mt-4" v-if="info.spio_answer">
+        <q-card-section class="row items-center justify-between">
+            <div class="text-h6 text-purple-600">SPIO Answer</div>
+        </q-card-section>
+        <q-card-section v-if="info.spio_answer">
+            <q-input
+                filled
+                readonly
+                type="textarea"
+                label="Answer"
+                v-model="info.spio_answer"
+                class="bg-grey-2"
+                autogrow
+            />
+
+            <p class="text-subtitle2 q-mt-sm">Answered on: {{info.spio_out}}</p>
+            <p class="text-subtitle2 q-mt-sm">
+                SPIO: {{ info.spio_name }}<br />
+                SPIO Contact: {{info.spio_contact}}
+            </p>
+
+            <div class="q-mt-md" v-if="info.spio_answer_file">
+                <div class="text-h8 mb-2">Attachments</div>
+                <div
+                    v-for="(file, index) in info.spio_answer_file.split(',')"
+                    :key="index"
+                    class="q-mb-sm"
+                >
+                    <q-icon name="attach_file" class="q-mr-sm text-primary" />
+                        <a
+                            :href="`/storage/files/${file.trim()}`"
+                            class="text-blue-600 underline"
+                            target="_blank"
+                            download
+                        >
+                            {{ file.trim() }}
+                        </a>
+                </div>
+            </div>
+
+        </q-card-section>
     </q-card>
 </template>
 
 
 <script setup>
-import {usePage, useForm, router} from "@inertiajs/vue3";
+import {useForm, router} from "@inertiajs/vue3";
 import {useQuasar} from "quasar";
 
 const $q = useQuasar()
@@ -59,7 +115,6 @@ const props = defineProps(['info']);
 
 const form = useForm({
     comment: '',
-
 })
 const submitComment = () => {
 
@@ -77,7 +132,6 @@ const submitComment = () => {
         cancel: true,
         persistent: true
     }).onOk(() => {
-
         axios.post(route('sapio.information.store', props.info), form)
             .then(() => {
                 $q.notify({
