@@ -9,6 +9,8 @@ use App\Http\Controllers\CitizenInformationController;
 use App\Http\Controllers\CitizenPaymentController;
 use App\Http\Controllers\PaymentCallbackController;
 use App\Http\Controllers\AspioController;
+use App\Http\Controllers\SpioController;
+
 
 Route::get('/', function () {
     return Inertia::render('Home');
@@ -73,3 +75,13 @@ Route::middleware(['auth'])->prefix('sapio')->group(function () {
     Route::post('information/{information}/comment', [AspioController::class,'store'])->name('sapio.information.store');
 });
 
+
+//SPIO
+Route::middleware(['auth'])->prefix('spio')->group(function () {
+    Route::get('information', [SpioController::class,'index'])->name('spio.information.index');
+    Route::get('/information/pending', [SpioController::class, 'pendingJson'])->name('spio.information.pending');
+    Route::get('/information/answered', [SpioController::class, 'answeredJson'])->name('spio.information.answered');
+    Route::get('/information/computer-generated', [SpioController::class, 'computerGeneratedJson'])->name('spio.information.computer-generated');
+    Route::get('information/{information}/show', [SpioController::class,'show'])->name('spio.information.show');
+    Route::post('information/{information}/answer', [SpioController::class,'store'])->name('spio.information.store');
+});

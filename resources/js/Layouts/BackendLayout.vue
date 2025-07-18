@@ -79,6 +79,7 @@
                     </div>
                 </div>
                 <q-separator class="q-my-sm"/>
+
                 <div v-if="user.role === 0">
                     <q-item :active="route().current()==='information.create'" active
                             active-class="active-menu "
