@@ -33,7 +33,7 @@
                 >
                     <q-icon name="attach_file" class="q-mr-sm text-primary" />
 
-                    <template v-if="!info.paid_attachments || info.paid_attachments.payment_status === 'Paid'">
+                    <template v-if="!info.paid_attachments || info.paid_attachments.payment_status === 'Paid'|| info.paid_attachments.payment_status === 'Free'">
                         <!-- Free or paid => allow download -->
                         <a
                             :href="`/storage/files/${file.trim()}`"
@@ -55,7 +55,7 @@
             <!-- Show Pay Now section only if attachment is paid and not yet paid -->
             <div
                 class="q-pa-md row items-center no-wrap q-gutter-md"
-                v-if="info.paid_attachments && info.paid_attachments.payment_status !== 'Paid'"
+                v-if="info.paid_attachments && info.paid_attachments.payment_status === 'Unpaid'"
             >
                 <div class="col-auto">
                     <q-btn

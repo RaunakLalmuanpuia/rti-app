@@ -149,16 +149,23 @@ class SpioController extends Controller
     }
     public function transfer(Request $request, Information $information){
 //        dd($request->all());
-
         $validated = $request->validate([
             'remark' => ['required', 'string', 'min:5', 'max:1000'],
             'department_id'   => ['required', 'exists:departments,id'],
         ]);
 
-
         $transfer = $this->repository->transferInformation($information, $validated);
 
         abort_if(blank($transfer),500,'Something Went Wrong');
+
+        //NOTIFY THE USER - Application Transfered
+
+        //NOTIFY THE DEPARTMENT
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Application transfered successfully.'
+        ]);
 
     }
 

@@ -448,7 +448,7 @@ const submitTransfer = () => {
                 transferDialog.value = false
                 transferRemark.value = ''
                 selectedDepartment.value = null
-                router.get(route('spio.information.show', props.info))
+                router.get(route('spio.information.index'))
             })
             .catch(error => {
                 if (error.response) {

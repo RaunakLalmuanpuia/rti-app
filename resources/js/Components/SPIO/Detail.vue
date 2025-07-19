@@ -135,6 +135,32 @@
             </q-markup-table>
         </q-card-section>
     </q-card>
+
+
+<!--    {{info}}-->
+    <q-card class="mt-4" v-if="info.secondhand_question_previous_department">
+        <q-card-section class="row items-center justify-between">
+            <div class="text-h6 text-primary">Transfer Reason</div>
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-section class="q-pa-none">
+            <q-markup-table flat class="text-subtitle2">
+                <tbody>
+                <tr>
+                    <th class="text-left">Previous Department Name</th>
+                    <td>{{ info.citizen_name }}</td>
+                </tr>
+                <tr>
+                    <th class="text-left">Previous Department Remark</th>
+                    <td>{{ info.secondhand_question_previous_department_remark }}</td>
+                </tr>
+                </tbody>
+            </q-markup-table>
+        </q-card-section>
+    </q-card>
+
 </template>
 
 <script setup>

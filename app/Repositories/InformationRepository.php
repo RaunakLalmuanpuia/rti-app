@@ -12,6 +12,7 @@ use Carbon\Carbon;
 
 use Illuminate\Support\Facades\Auth;
 
+use Illuminate\Support\Facades\Log;
 use Intervention\Image\Facades\Image;
 class InformationRepository
 {
@@ -219,6 +220,7 @@ class InformationRepository
     }
     public function storeAnswer(Information $information, array $data)
     {
+//        dd($data);
         $now = Carbon::now();
         $user = Auth::user();
 
@@ -242,7 +244,8 @@ class InformationRepository
             $paidAttachment->amount = $data['attachment_price'] ?? 0;
             $paidAttachment->attachment_name = implode(',', $fileData);
 
-            if (isset($data['is_free']) && $data['is_free'] === false) {
+            if (isset($data['is_free']) && (int)$data['is_free'] === 0)
+            {
                 $paidAttachment->payment_status = 'Unpaid'; // Paid but not yet received
             } else {
                 $paidAttachment->payment_status = 'Free';
@@ -271,10 +274,110 @@ class InformationRepository
 
     public function transferInformation(Information $information, array $data)
     {
-        $now = Carbon::now();
-        $user = Auth::user();
 
-        dd($data);
+        $now = Carbon::now();
+
+        $tempOrderId = $information->order_id;
+        $tempTrackingId = $information->tracking_id;
+        $tempBankRefNo = $information->bank_ref_no;
+
+        $transferInformation = new Information();
+
+        // Determine whether ASPIO exists in the to-department
+        $myAspio = User::where('department', $data['department_id'])
+            ->where('bio', 'aspio')
+            ->where('status', 'Accept')
+            ->get();
+
+        $mySpio = User::where('department', $data['department_id'])
+            ->where('bio', 'spio')
+            ->where('status', 'Accept')
+            ->get();
+
+        // If no SPIO exists in the target department, return error view
+        if ($mySpio->isEmpty()) {
+            return view("information.nodepartment");
+        }
+        // Timestamp handling
+        $transferInformation->spio_in = $now;
+        if ($myAspio->isNotEmpty()) {
+            $transferInformation->aspio_in = $now;
+        }
+
+        // Mark current information as transferred
+        $information->transfer = "Already transferred";
+        $information->spio_transfer_remark = $data["remark"];
+
+        // Preserve old identifiers with "OLD_" tag
+        if ($information->order_id) {
+            $mRand = rand(1000, 9999);
+            $information->order_id = "OLD_{$mRand}_{$information->order_id}";
+            $information->tracking_id = "OLD_{$mRand}_{$information->tracking_id}";
+            $information->bank_ref_no = "OLD_{$mRand}_{$information->bank_ref_no}";
+        }
+
+        $information->secondhand_question_previous_department = $data['department_id'];
+        $information->update();
+
+        // Fill new transfer information
+        $transferInformation->user_id = $information->user_id;
+        $transferInformation->citizen_question_file = $information->citizen_question_file;
+        $transferInformation->citizen_name = $information->citizen_name;
+        $transferInformation->citizen_contact = $information->citizen_contact;
+        $transferInformation->citizen_address = $information->citizen_address;
+        $transferInformation->citizen_question = $information->citizen_question;
+        $transferInformation->citizen_question_department = $data['department_id'];
+        $transferInformation->citizen_bpl_file = $information->citizen_bpl_file;
+        $transferInformation->citizen_bpl = $information->citizen_bpl;
+        $transferInformation->life_or_death = $information->life_or_death;
+
+        $transferInformation->spio_transfer_remark = $data['remark'];
+        $transferInformation->spio_transfer_department = $data['department_id'];
+
+        $transferInformation->order_id = $tempOrderId;
+        $transferInformation->tracking_id = $tempTrackingId;
+        $transferInformation->bank_ref_no = $tempBankRefNo;
+
+        // Determine transfer source (local council or department)
+        $isLocalCouncil = !is_null($information->citizen_question_locall_council);
+
+        // 👇 Add these two based on transfer type
+        if ($isLocalCouncil) {
+            $transferInformation->citizen_question_locall_council = $data['department_id'];
+            $transferInformation->citizen_question_department = null;
+        } else {
+            $transferInformation->citizen_question_locall_council = null;
+        }
+
+
+        if ($isLocalCouncil) {
+            $transferInformation->secondhand_question_previous_department = $information->citizen_question_locall_council;
+            $mySpioPre = User::withTrashed()
+                ->where('local_council', $information->citizen_question_locall_council)
+                ->where('bio', 'spio')
+                ->where('status', 'Accept')
+                ->first();
+
+            $mySpioPreDept = LocalCouncil::find($mySpioPre->local_council);
+        } else {
+            $transferInformation->secondhand_question_previous_department = $information->citizen_question_department;
+            $mySpioPre = User::withTrashed()
+                ->where('department', $information->citizen_question_department)
+                ->where('bio', 'spio')
+                ->where('status', 'Accept')
+                ->first();
+
+            $mySpioPreDept = Department::find($mySpioPre->department);
+        }
+
+        // Append transfer remark
+        $previousRemarks = $information->secondhand_question_previous_department_remark ?? '';
+        $newRemark = "Received by: {$mySpioPre->name} ({$mySpioPreDept->name}), {$mySpioPre->contact}. At {$information->spio_in}. {$data['remark']}";
+        $transferInformation->secondhand_question_previous_department_remark = "{$newRemark}\n{$previousRemarks}";
+
+        $transferInformation->save();
+
+        return $transferInformation;
 
     }
 
