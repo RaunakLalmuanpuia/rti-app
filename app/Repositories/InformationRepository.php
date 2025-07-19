@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Department;
 use App\Models\Information;
 use App\Models\LocalCouncil;
+use App\Models\PaidAttachment;
 use App\Models\PrePayment;
 use App\Models\User;
 use Carbon\Carbon;
@@ -199,7 +200,6 @@ class InformationRepository
         $information->update();
         return $information;
     }
-
     public function storeComment($comment, $information){
 
         $now = Carbon::now();
@@ -216,6 +216,66 @@ class InformationRepository
         $information->update();
 
         return $information;
+    }
+    public function storeAnswer(Information $information, array $data)
+    {
+        $now = Carbon::now();
+        $user = Auth::user();
+
+        if (!empty($data['attachment'])) {
+            $fileData = [];
+
+            foreach ($data['attachment'] as $file) {
+                $name = 'spio' . time() . rand(1000, 9999) . '.' . $file->getClientOriginalExtension();
+                $file->move(storage_path('app/public/files/'), $name);
+                $fileData[] = $name;
+            }
+
+            // Store filenames in comma-separated format
+            $information->spio_answer_file = implode(',', $fileData);
+
+            // Store PaidAttachment
+            $paidAttachment = new PaidAttachment();
+            $paidAttachment->information_id = $information->id;
+            $paidAttachment->user_id = $information->user_id;
+
+            $paidAttachment->amount = $data['attachment_price'] ?? 0;
+            $paidAttachment->attachment_name = implode(',', $fileData);
+
+            if (isset($data['is_free']) && $data['is_free'] === false) {
+                $paidAttachment->payment_status = 'Unpaid'; // Paid but not yet received
+            } else {
+                $paidAttachment->payment_status = 'Free';
+            }
+
+            $paidAttachment->save();
+        }
+
+        $information->spio_answer = $data['answer'];
+        $information->spio_out = $now;
+        $information->spio_id = $user->id;
+
+        //add on25May,2023, Officer ho ID ang a lo store chu name leh phone dah belh.
+        $information->spio_name = $user->name;
+        $information->spio_contact = $user->contact;
+        $information->spio_email = $user->email;
+        //end
+
+        $information->information_status = 1; //answer by SPIO
+
+        //https://docs.google.com/document/d/1K-5aqsG9HYl7dTd8p7h7PqIavSrq57JbqKbov-Q4CjI/edit
+        //THIS ABOVE CODE IS DEFINE IN THE LINK
+        $information->update();
+        return $information;
+    }
+
+    public function transferInformation(Information $information, array $data)
+    {
+        $now = Carbon::now();
+        $user = Auth::user();
+
+        dd($data);
+
     }
 
 }

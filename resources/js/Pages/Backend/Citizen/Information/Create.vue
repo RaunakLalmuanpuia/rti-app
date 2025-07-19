@@ -217,6 +217,7 @@ const loadingDepartments = ref(false)
 
 const localCouncilOptions = ref([])
 
+
 const searchDepartments = async (val, update, abort) => {
     if (!val || val.length < 2) {
         update(() => {
@@ -245,6 +246,7 @@ const searchDepartments = async (val, update, abort) => {
             loadingDepartments.value = false
         })
 }
+
 const fetchLocalCouncils = async (district) => {
     localCouncilOptions.value = []
     if (!district) return

@@ -84,4 +84,5 @@ Route::middleware(['auth'])->prefix('spio')->group(function () {
     Route::get('/information/computer-generated', [SpioController::class, 'computerGeneratedJson'])->name('spio.information.computer-generated');
     Route::get('information/{information}/show', [SpioController::class,'show'])->name('spio.information.show');
     Route::post('information/{information}/answer', [SpioController::class,'store'])->name('spio.information.store');
+    Route::post('information/{information}/transfer', [SpioController::class,'transfer'])->name('spio.information.transfer');
 });

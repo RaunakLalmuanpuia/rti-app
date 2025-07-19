@@ -125,7 +125,41 @@ class SpioController extends Controller
     }
 
     public function store(Request $request, Information $information){
-        dd($request);
+
+        $validated=$request->validate([
+            'answer' => ['required', 'string', 'min:3'],
+            'attachment' => ['nullable', 'array', 'max:8'], // max 8 files
+            'attachment.*' => ['file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
+            'is_free' => ['required_with:attachment', 'boolean'],
+            'attachment_price' => ['required_if:is_free,false', 'nullable', 'numeric', 'min:0'],
+        ]);
+
+        $answer=$this->repository->storeAnswer($information,$validated);
+
+        abort_if(blank($answer),500,'Something Went Wrong');
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Answer saved successfully.'
+        ]);
+    }
+
+    public function update(Request $request, Information $information){
+
+    }
+    public function transfer(Request $request, Information $information){
+//        dd($request->all());
+
+        $validated = $request->validate([
+            'remark' => ['required', 'string', 'min:5', 'max:1000'],
+            'department_id'   => ['required', 'exists:departments,id'],
+        ]);
+
+
+        $transfer = $this->repository->transferInformation($information, $validated);
+
+        abort_if(blank($transfer),500,'Something Went Wrong');
+
     }
 
 
