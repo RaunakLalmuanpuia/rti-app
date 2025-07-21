@@ -414,4 +414,28 @@ class InformationRepository
         return $information;
     }
 
+
+    public function storeSecondAppealReply(Information $information, array $data){
+        $now = Carbon::now();
+        $user = Auth::user();
+
+        if($data['attachment']!=null){
+            $fileData =[];
+            foreach( $data['attachment'] as $file){
+                $name = "2app".time().rand(1000,9999).'.'.$file->getClientOriginalExtension();
+                //    $file->move(public_path().'/files/', $name);
+                $file->move(storage_path('app/public').'/files/', $name);
+
+                $fileData[] = $name;
+            }
+            $information->second_appeal_cic_answer_file = implode(",",$fileData);//TURN THE ARRAY INTO STRING SEPERATE BY COMMA
+        }
+
+        $information->second_appeal_cic_answer = $data['reply'];
+        $information->second_appeal_cic_out = $now;
+        $information->update();
+
+        return $information;
+    }
+
 }

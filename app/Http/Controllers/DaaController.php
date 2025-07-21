@@ -243,9 +243,15 @@ class DaaController extends Controller
 
         abort_if(blank($firstAppealReply),500,'Something Went Wrong');
 
+        // Notify applicant sms -application updated
+
         return response()->json([
             'status' => 'success',
             'message' => 'Answer saved successfully.'
         ]);
+    }
+
+    public function update(Request $request, Information $information){
+
     }
 }

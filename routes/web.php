@@ -11,6 +11,8 @@ use App\Http\Controllers\PaymentCallbackController;
 use App\Http\Controllers\AspioController;
 use App\Http\Controllers\SpioController;
 use App\Http\Controllers\DaaController;
+use App\Http\Controllers\CicController;
+
 
 Route::get('/', function () {
     return Inertia::render('Home');
@@ -98,3 +100,14 @@ Route::middleware(['auth'])->prefix('daa')->group(function () {
     Route::get('information/{information}/show', [DaaController::class,'show'])->name('daa.information.show');
     Route::post('information/{information}/answer', [DaaController::class,'store'])->name('daa.information.store');
 });
+
+
+//DAA
+Route::middleware(['auth'])->prefix('cic')->group(function () {
+    Route::get('information', [CicController::class,'index'])->name('cic.information.index');
+    Route::get('/information/pending', [CicController::class, 'pendingJson'])->name('cic.information.pending');
+    Route::get('/information/answered', [CicController::class, 'answeredJson'])->name('cic.information.answered');
+    Route::get('information/{information}/show', [CicController::class,'show'])->name('cic.information.show');
+    Route::post('information/{information}/answer', [CicController::class,'store'])->name('cic.information.store');
+});
+
