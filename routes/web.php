@@ -10,7 +10,7 @@ use App\Http\Controllers\CitizenPaymentController;
 use App\Http\Controllers\PaymentCallbackController;
 use App\Http\Controllers\AspioController;
 use App\Http\Controllers\SpioController;
-
+use App\Http\Controllers\DaaController;
 
 Route::get('/', function () {
     return Inertia::render('Home');
@@ -85,4 +85,15 @@ Route::middleware(['auth'])->prefix('spio')->group(function () {
     Route::get('information/{information}/show', [SpioController::class,'show'])->name('spio.information.show');
     Route::post('information/{information}/answer', [SpioController::class,'store'])->name('spio.information.store');
     Route::post('information/{information}/transfer', [SpioController::class,'transfer'])->name('spio.information.transfer');
+});
+
+
+//DAA
+Route::middleware(['auth'])->prefix('daa')->group(function () {
+    Route::get('information', [DaaController::class,'index'])->name('daa.information.index');
+    Route::get('/information/pending', [DaaController::class, 'pendingJson'])->name('daa.information.pending');
+    Route::get('/information/answered', [DaaController::class, 'answeredJson'])->name('daa.information.answered');
+    Route::get('/information/computer-generated', [DaaController::class, 'allApplicationJson'])->name('daa.information.all-application');
+    Route::get('information/{information}/show', [DaaController::class,'show'])->name('daa.information.show');
+    Route::post('information/{information}/answer', [DaaController::class,'store'])->name('daa.information.store');
 });
