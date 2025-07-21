@@ -381,4 +381,37 @@ class InformationRepository
 
     }
 
+    public function storeFirstAppealReply(Information $information, array $data){
+        $now = Carbon::now();
+        $user = Auth::user();
+
+        if($data['attachment']!=null){
+            $fileData =[];
+            foreach( $data['attachment'] as $file){
+                $name = "1app".time().rand(1000,9999).'.'.$file->getClientOriginalExtension();
+                //    $file->move(public_path().'/files/', $name);
+                $file->move(storage_path('app/public').'/files/', $name);
+
+                $fileData[] = $name;
+            }
+            $information->first_appeal_daa_answer_file = implode(",",$fileData);//TURN THE ARRAY INTO STRING SEPERATE BY COMMA
+        }
+
+        $information->first_appeal_daa_answer = $data['reply'];
+        $information->first_appeal_daa_out = $now;
+        $information->daa_id = $user->id;
+
+        //add on25May,2023, Officer ho ID ang a lo store chu name leh phone dah belh.
+        $information->daa_name = $user->name;
+        $information->daa_contact = $user->contact;
+        $information->daa_email = $user->email;
+
+
+        //THIS IS TO BE ENABLE FOR DAA IF IT IS WORKING   $information->information_status = 1;
+        $information->information_status = 2; //answer by DAA
+
+        $information->update();
+        return $information;
+    }
+
 }

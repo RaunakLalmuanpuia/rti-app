@@ -13,7 +13,9 @@
         >
             <q-tab name="pending" label="Pending" />
             <q-tab name="answered" label="Answered" />
+            <q-tab name="computerGenerated" label="Computer Generated" />
             <q-tab name="allApplication" label="All Applications" />
+
 
         </q-tabs>
 
@@ -26,6 +28,11 @@
             <q-tab-panel name="answered">
                 <Answered />
             </q-tab-panel>
+
+            <q-tab-panel name="computerGenerated">
+                <ComputerGenerated />
+            </q-tab-panel>
+
 
             <q-tab-panel name="allApplication">
                 <AllApplication />
@@ -44,7 +51,7 @@ import BackendLayout from "@/Layouts/BackendLayout.vue";
 import Pending from "@/Components/DAA/Information/Pending.vue";
 import Answered from "@/Components/DAA/Information/Answered.vue";
 import AllApplication from "@/Components/DAA/Information/AllApplication.vue";
-
+import ComputerGenerated from "@/Components/DAA/Information/ComputerGenerated.vue";
 
 defineOptions({ layout: BackendLayout });
 

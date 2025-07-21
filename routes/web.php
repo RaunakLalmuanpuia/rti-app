@@ -93,7 +93,8 @@ Route::middleware(['auth'])->prefix('daa')->group(function () {
     Route::get('information', [DaaController::class,'index'])->name('daa.information.index');
     Route::get('/information/pending', [DaaController::class, 'pendingJson'])->name('daa.information.pending');
     Route::get('/information/answered', [DaaController::class, 'answeredJson'])->name('daa.information.answered');
-    Route::get('/information/computer-generated', [DaaController::class, 'allApplicationJson'])->name('daa.information.all-application');
+    Route::get('/information/computer-generated', [DaaController::class, 'computerGeneratedJson'])->name('daa.information.computer-generated');
+    Route::get('/information/all-application', [DaaController::class, 'allApplicationJson'])->name('daa.information.all-application');
     Route::get('information/{information}/show', [DaaController::class,'show'])->name('daa.information.show');
     Route::post('information/{information}/answer', [DaaController::class,'store'])->name('daa.information.store');
 });
