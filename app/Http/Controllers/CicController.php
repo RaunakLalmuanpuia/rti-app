@@ -112,4 +112,41 @@ class CicController extends Controller
         ]);
     }
 
+
+    public function complainIndex(Request $request){
+
+        return Inertia::render('Backend/CIC/Complain/Index');
+    }
+
+    public function complainJson(Request $request){
+        $search = $request->input('filter');
+        $perPage = $request->input('rowsPerPage', 15);
+
+        $query = Information::with('department')
+            ->whereNotNull('complain');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('citizen_name', 'like', "%{$search}%")
+                    ->orWhere('citizen_question', 'like', "%{$search}%");
+            });
+        }
+
+        $list = $query
+            ->orderBy('updated_at', 'desc')
+            ->paginate($perPage)
+            ->appends($request->all());
+
+        return response()->json([
+            'list' => $list
+        ]);
+    }
+
+    public function complainShow(Information $information){
+        $information->load(['department','local_council','paidAttachments']);
+        return Inertia::render('Backend/CIC/Show',[
+            'info' => $information
+        ]);
+    }
+
 }

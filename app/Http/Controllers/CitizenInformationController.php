@@ -11,7 +11,9 @@ use App\Models\User;
 use App\Repositories\InformationRepository;
 
 use App\Traits\CanPay;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
@@ -25,6 +27,79 @@ class CitizenInformationController extends Controller
     {
         $this->repository = $informationRepository;
     }
+
+    public function index(){
+        return Inertia::render('Backend/Citizen/Index');
+    }
+
+    public function indexJson(Request $request)
+    {
+
+        $user = Auth::user();
+
+        $search = $request->input('filter');
+        $perPage = $request->input('rowsPerPage', 15);
+
+
+        $query = Information::with('department')
+            ->where('user_id', $user->id)
+            ->whereNull('complain')
+            ->whereNull('transfer');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('citizen_name', 'like', "%{$search}%")
+                    ->orWhere('citizen_question', 'like', "%{$search}%")
+                    ->orWhereHas('department', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $list = $query
+            ->orderBy('updated_at', 'desc')
+            ->paginate($perPage)
+            ->appends($request->all());
+
+        return response()->json([
+            'list' => $list
+        ]);
+    }
+
+    public function complainJson(Request $request)
+    {
+
+        $user = Auth::user();
+
+        $search = $request->input('filter');
+        $perPage = $request->input('rowsPerPage', 15);
+
+
+        $query = Information::with('department')
+            ->where('user_id', $user->id)
+            ->whereNotNull('complain')
+            ->whereNull('transfer');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('citizen_name', 'like', "%{$search}%")
+                    ->orWhere('citizen_question', 'like', "%{$search}%")
+                    ->orWhereHas('department', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $list = $query
+            ->orderBy('updated_at', 'desc')
+            ->paginate($perPage)
+            ->appends($request->all());
+
+        return response()->json([
+            'list' => $list
+        ]);
+    }
+
     public function create(){
 
         return Inertia::render('Backend/Citizen/Information/Create');
@@ -232,6 +307,57 @@ class CitizenInformationController extends Controller
             'message' => 'Second Appeal filed successfully.'
         ]);
 
+    }
+    public function createComplain(){
+        return Inertia::render('Backend/Citizen/Complain/Create');
+    }
+    public function storeComplain(Request $request){
+
+        $user = Auth::user();
+        $now = Carbon::now();
+
+        $validated = $request->validate([
+            'complain' => ['required', 'string', 'min:5', 'max:1000'],
+            'attachment' => ['nullable','array'],
+            'attachment.*' => ['file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
+        ]);
+
+        $information = new Information();
+        $information->user_id = $user->id;
+
+        $information->citizen_name = $user->name;
+        $information->citizen_contact = $user->contact;
+        $information->citizen_address = $user->address;
+        $information->citizen_question = $validated['complain'];
+
+        if($request['attachment']!=null){
+            $data =[];
+            foreach($request['attachment'] as $file){
+                $name = "comp".time().rand(1000,9999).'.'.$file->getClientOriginalExtension();
+                // $file->move(public_path().'/files/', $name);
+                $file->move(storage_path('app/public').'/files/', $name);
+
+                $data[] = $name;
+            }
+            $information->citizen_question_file = implode(",",$data);//TURN THE ARRAY INTO STRING SEPERATE BY COMMA
+        }
+
+        $information->complain = true;
+        $information->second_appeal_cic_in = $now;
+        $information->second_appeal_citizen_question =  $validated['complain'];//CIC TA TUR A NIH AVANGIN CIC QUESTION TUR AH KAN DAH NGHAL
+        $information->save();
+
+        //Notify CIC Complain filed -sms
+
+        abort_if(blank($information),500,'Something Went Wrong');
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Complain Submitted Successfully.'
+        ]);
+
+    }
+    public function showComplain(){
     }
 
 

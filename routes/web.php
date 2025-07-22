@@ -47,6 +47,8 @@ Route::group(['middleware' => 'auth', 'prefix' => 'dashboard'], function () {
 
 //Citizen Information
 Route::group(['middleware' => 'auth', 'prefix' => 'citizen'], function () {
+    Route::get('index',[CitizenInformationController::class,'index'])->name('information.index');
+    Route::get('indexJson',[CitizenInformationController::class,'indexJson'])->name('information.json-index');
     Route::get('create',[CitizenInformationController::class,'create'])->name('information.create');
     Route::get('search-department',[CitizenInformationController::class,'searchDepartment'])->name('information.search-department');
     Route::get('get-local_council',[CitizenInformationController::class,'getLocalCouncil'])->name('information.get-local_council');
@@ -55,6 +57,12 @@ Route::group(['middleware' => 'auth', 'prefix' => 'citizen'], function () {
     Route::post('pay-attachment/{attachment}', [CitizenInformationController::class, 'payAttachment'])->name('information.pay-attachment');
     Route::post('first-appeal/{information}', [CitizenInformationController::class, 'firstAppeal'])->name('information.first-appeal');
     Route::post('second-appeal/{information}', [CitizenInformationController::class, 'secondAppeal'])->name('information.second-appeal');
+
+
+    //Complain
+    Route::get('complain/index',[CitizenInformationController::class,'complainJson'])->name('information.complain.json-index');
+    Route::get('complain/create',[CitizenInformationController::class,'createComplain'])->name('citizen.complain.create');
+    Route::post('complain/store', [CitizenInformationController::class, 'storeComplain'])->name('citizen.complain.store');
 });
 
 // Citizen Payment
@@ -102,12 +110,16 @@ Route::middleware(['auth'])->prefix('daa')->group(function () {
 });
 
 
-//DAA
+//CIC
 Route::middleware(['auth'])->prefix('cic')->group(function () {
     Route::get('information', [CicController::class,'index'])->name('cic.information.index');
     Route::get('/information/pending', [CicController::class, 'pendingJson'])->name('cic.information.pending');
     Route::get('/information/answered', [CicController::class, 'answeredJson'])->name('cic.information.answered');
     Route::get('information/{information}/show', [CicController::class,'show'])->name('cic.information.show');
     Route::post('information/{information}/answer', [CicController::class,'store'])->name('cic.information.store');
+
+    //Complain
+    Route::get('complain', [CicController::class,'complainIndex'])->name('cic.complain.index');
+    Route::get('/complain/json', [CicController::class, 'complainJson'])->name('cic.complain.json');
 });
 
