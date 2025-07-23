@@ -40,7 +40,6 @@ class DaaController extends Controller
         $query = Information::with('department')
             ->whereNotNull('first_appeal_citizen_question')
             ->whereNull('first_appeal_daa_answer')
-            ->where('information_status', '!=', 22)
             ->whereNull('complain')
             ->whereNull('transfer')
             ->where(function ($q) use ($userDepartment, $deptIds) {
@@ -90,7 +89,7 @@ class DaaController extends Controller
         // Build combined query
         $query = Information::with('department')
             ->whereNotNull('first_appeal_daa_answer')
-            ->where('information_status', '!=', 22)
+            ->where('information_status',2)
             ->whereNull('complain')
             ->whereNull('transfer')
             ->where(function ($q) use ($userDepartment, $deptIds) {

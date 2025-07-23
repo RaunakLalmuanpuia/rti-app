@@ -62,6 +62,7 @@ class SpioController extends Controller
         $query = Information::with('department')
             ->where('citizen_question_department', $userDepartmentId)
             ->whereNotNull('spio_answer')
+            ->where('information_status', 1)
             ->whereNull('complain')
             ->whereNull('transfer');
 

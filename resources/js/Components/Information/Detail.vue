@@ -136,8 +136,6 @@
         </q-card-section>
     </q-card>
 
-
-<!--    {{info}}-->
     <q-card class="mt-4" v-if="info.secondhand_question_previous_department">
         <q-card-section class="row items-center justify-between">
             <div class="text-h6 text-primary">Transfer Reason</div>
@@ -160,6 +158,7 @@
             </q-markup-table>
         </q-card-section>
     </q-card>
+
 </template>
 
 <script setup>
