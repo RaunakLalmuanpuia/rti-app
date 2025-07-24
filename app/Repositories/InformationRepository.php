@@ -47,7 +47,7 @@ class InformationRepository
         }
 
 
-        if ($request['attachment'] != null) {
+        if (!empty($request['attachment'])) {
             $data = [];
             foreach ($request['attachment'] as $file) {
 
@@ -165,7 +165,7 @@ class InformationRepository
         $information->first_appeal_daa_in = $now;
         $information->first_appeal_citizen_question = $request['appeal_reason'];
 
-        if($request['attachment']!=null){
+        if(!empty($request['attachment'])){
             $data =[];
             foreach($request['attachment'] as $file){
                 $name = "1app".time().rand(1000,9999).'.'.$file->getClientOriginalExtension();
@@ -187,7 +187,7 @@ class InformationRepository
         $information->second_appeal_cic_in = $now;
 
         $information->second_appeal_citizen_question = $request['appeal_reason'];
-        if($request['attachment']!=null){
+        if(!empty($request['attachment'])){
             $data =[];
             foreach($request['attachment'] as $file){
                 $name = "2app".time().rand(1000,9999).'.'.$file->getClientOriginalExtension();
@@ -385,7 +385,7 @@ class InformationRepository
         $now = Carbon::now();
         $user = Auth::user();
 
-        if($data['attachment']!=null){
+        if(!empty($data['attachment'])){
             $fileData =[];
             foreach( $data['attachment'] as $file){
                 $name = "1app".time().rand(1000,9999).'.'.$file->getClientOriginalExtension();
@@ -417,9 +417,8 @@ class InformationRepository
 
     public function storeSecondAppealReply(Information $information, array $data){
         $now = Carbon::now();
-        $user = Auth::user();
 
-        if($data['attachment']!=null){
+        if(!empty($data['attachment'])){
             $fileData =[];
             foreach( $data['attachment'] as $file){
                 $name = "2app".time().rand(1000,9999).'.'.$file->getClientOriginalExtension();
