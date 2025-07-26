@@ -1,15 +1,20 @@
 <template>
+
     <div class="q-pa-md">
         <div class="text-h6 mb-4">SAPIO INFORMATION INDEX</div>
+
+        <div class="text-h6 mb-4 text-blue-400">Department: {{ $page.props.auth.user.dept.name }}</div>
 
         <!-- Tabs -->
         <q-tabs
             v-model="tab"
             dense
-            align="left"
+            align="justify"
             active-color="primary"
             indicator-color="primary"
             class="q-mb-md"
+
+
         >
             <q-tab name="application" label="Application" />
             <q-tab name="commented" label="Commented" />

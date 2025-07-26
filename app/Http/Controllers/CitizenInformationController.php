@@ -144,6 +144,10 @@ class CitizenInformationController extends Controller
             'attachment.*' => ['file', 'mimes:pdf,jpg,jpeg,png']
         ]);
 
+        if (!$request->department && !$request->local_council) {
+            abort(500, 'Either Department or Local Council is required.');
+        }
+
         $razorpayOrder=$this->initiatePayment();
 
         $order_id = $razorpayOrder['id'];

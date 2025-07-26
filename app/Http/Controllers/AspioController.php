@@ -43,10 +43,7 @@ class AspioController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('citizen_name', 'like', "%{$search}%")
-                    ->orWhere('citizen_question', 'like', "%{$search}%")
-                    ->orWhereHas('department', function ($q2) use ($search) {
-                        $q2->where('name', 'like', "%{$search}%");
-                    });
+                    ->orWhere('citizen_question', 'like', "%{$search}%");
             });
         }
 
@@ -75,10 +72,7 @@ class AspioController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('citizen_name', 'like', "%{$search}%")
-                    ->orWhere('citizen_question', 'like', "%{$search}%")
-                    ->orWhereHas('department', function ($q2) use ($search) {
-                        $q2->where('name', 'like', "%{$search}%");
-                    });
+                    ->orWhere('citizen_question', 'like', "%{$search}%");
             });
         }
 

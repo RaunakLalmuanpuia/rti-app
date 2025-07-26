@@ -36,12 +36,13 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
         return [
             ...parent::share($request),
             //
             'current_route' => Route::current()->getName(),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user ? $user->load(['dept', 'localCouncil']) : null,
             ],
         ];
     }
