@@ -48,7 +48,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'dashboard'], function () {
 //Citizen Information
 Route::group(['middleware' => 'auth', 'prefix' => 'citizen'], function () {
     Route::get('index',[CitizenInformationController::class,'index'])->name('information.index');
-    Route::get('indexJson',[CitizenInformationController::class,'indexJson'])->name('information.json-index');
+    Route::get('index-json',[CitizenInformationController::class,'indexJson'])->name('information.json-index');
     Route::get('create',[CitizenInformationController::class,'create'])->name('information.create');
     Route::get('search-department',[CitizenInformationController::class,'searchDepartment'])->name('information.search-department');
     Route::get('get-local_council',[CitizenInformationController::class,'getLocalCouncil'])->name('information.get-local_council');

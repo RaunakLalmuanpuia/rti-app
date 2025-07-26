@@ -21,9 +21,7 @@ class InformationRepository
 
     }
     public function storePreInformation($request, $order_id, $amount){
-
         $user = Auth::user();
-
         $prePayment = new PrePayment();
 
 
@@ -153,9 +151,7 @@ class InformationRepository
 
         $information->save();
 
-        //Notify Spio
-
-        return true;
+        return $information;
 
     }
     public function storeFirstAppeal($request, $information)
@@ -271,7 +267,6 @@ class InformationRepository
         $information->update();
         return $information;
     }
-
     public function transferInformation(Information $information, array $data)
     {
 
@@ -380,7 +375,6 @@ class InformationRepository
         return $transferInformation;
 
     }
-
     public function storeFirstAppealReply(Information $information, array $data){
         $now = Carbon::now();
         $user = Auth::user();
@@ -413,8 +407,6 @@ class InformationRepository
         $information->update();
         return $information;
     }
-
-
     public function storeSecondAppealReply(Information $information, array $data){
         $now = Carbon::now();
 
