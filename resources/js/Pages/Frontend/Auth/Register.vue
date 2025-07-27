@@ -54,15 +54,19 @@
                             <div class="text-left">
                                 <p class="login-title">Register</p>
                             </div>
+
                             <q-input label="Name" v-model="form.name" outlined no-error-icon :error="!!form.errors?.name"
                                      :error-message="form.errors?.name?.toString()"
                                      :rules="[val => !!val || 'Name is required']" />
-                            <q-input label="Designation" v-model="form.name" outlined no-error-icon :error="!!form.errors?.name"
-                                     :error-message="form.errors?.name?.toString()"
-                                     :rules="[val => !!val || 'Name is required']" />
+
+                            <q-input label="Designation" v-model="form.designation" outlined no-error-icon :error="!!form.errors?.designation"
+                                     :error-message="form.errors?.designation?.toString()"
+                                     :rules="[val => !!val || 'Designation is required']" />
+
                             <q-input label="Email" v-model="form.email" outlined no-error-icon :error="!!form.errors?.email"
                                      :error-message="form.errors?.email?.toString()"
                                      :rules="[val => !!val || 'Email is required']" />
+
                             <q-input label="Password" v-model="form.password" :type="state.visiblePassword ? 'text' : 'password'"
                                      outlined no-error-icon :error="!!form.errors?.password"
                                      :error-message="form.errors?.password?.toString()"
@@ -72,28 +76,53 @@
                                             :name="state.visiblePassword ? 'visibility' : 'visibility_off'" />
                                 </template>
                             </q-input>
+
                             <q-input label="Confirm Password" :type="state.visiblePassword ? 'text' : 'password'"
                                      v-model="form.password_confirmation"
                                      outlined no-error-icon :error="!!form.errors?.password_confirmation"
                                      :error-message="form.errors?.password_confirmation?.toString()"
                                      :rules="[
-                                         val => !!val || 'Confirm Password is required',
-                                         val => val === form.password || 'Confirm password does not match password'
-                                     ]" />
+             val => !!val || 'Confirm Password is required',
+             val => val === form.password || 'Confirm password does not match password'
+           ]" />
 
-                            <q-input label="Contact" v-model="form.name" outlined no-error-icon :error="!!form.errors?.name"
-                                     :error-message="form.errors?.name?.toString()"
-                                     :rules="[val => !!val || 'Name is required']" />
+                            <!-- Contact (disabled and bound to otpForm.mobile) -->
+                            <q-input label="Contact" v-model="otpForm.mobile" outlined no-error-icon disable
+                                     :error="!!form.errors?.contact"
+                                     :error-message="form.errors?.contact?.toString()"
+                                     :rules="[val => !!val || 'Contact is required']" />
 
-                            <q-input label="Address" v-model="form.name" outlined no-error-icon :error="!!form.errors?.name"
-                                     :error-message="form.errors?.name?.toString()"
-                                     :rules="[val => !!val || 'Name is required']" />
-                            <q-input label="Role" v-model="form.name" outlined no-error-icon :error="!!form.errors?.name"
-                                     :error-message="form.errors?.name?.toString()"
-                                     :rules="[val => !!val || 'Name is required']" />
-                            <q-input label="Department" v-model="form.name" outlined no-error-icon :error="!!form.errors?.name"
-                                     :error-message="form.errors?.name?.toString()"
-                                     :rules="[val => !!val || 'Name is required']" />
+                            <q-input label="Address" v-model="form.address" outlined no-error-icon :error="!!form.errors?.address"
+                                     :error-message="form.errors?.address?.toString()"
+                                     :rules="[val => !!val || 'Address is required']" />
+
+                            <!-- Role select -->
+                            <q-select label="Role" v-model="form.role" outlined no-error-icon :error="!!form.errors?.role"
+                                      :error-message="form.errors?.role?.toString()"
+                                      :options="['SAPIO','SPIO','DAA']"
+                                      :rules="[val => !!val || 'Role is required']" />
+
+                            <!-- Department select - allow multiple when role is DAA -->
+                            <q-select
+                                :options="departmentOptions"
+                                @filter="searchDepartments"
+                                :loading="loadingDepartments"
+                                emit-value
+                                use-input
+                                input-debounce="300"
+                                map-options
+                                option-value="id"
+                                option-label="name"
+                                label="Department"
+                                clearable
+                                v-model="form.department"
+                                outlined
+                                no-error-icon
+                                :error="!!form.errors?.department"
+                                :error-message="form.errors?.department?.toString()"
+                                :rules="[val => !!val || 'Department is required']"
+                                :multiple="form.role === 'DAA'"
+                            />
 
                             <div class="flex q-mt-sm">
                                 <q-btn class="sized-btn" color="blue" type="submit" rounded label="Register" no-caps />
@@ -113,7 +142,8 @@ import FrontendLayout from "@/Layouts/FrontendLayout.vue";
 
 import {router, useForm} from "@inertiajs/vue3";
 import {useQuasar} from "quasar";
-import {reactive} from "vue";
+import {reactive, ref} from "vue";
+import axios from "axios";
 defineOptions({layout:FrontendLayout})
 
 const q = useQuasar();
@@ -126,10 +156,14 @@ const state = reactive({
 
 const form = useForm({
     name: '',
-    mobile: '',
     email: '',
     password: '',
-    password_confirmation: ''
+    password_confirmation: '',
+    designation:'',
+    address:'',
+    contact:'',
+    role:'',
+    department:null,
 });
 
 const otpForm = useForm({
@@ -175,16 +209,54 @@ const handleOtpConfirm = () => {
 
 const handleRegister = () => {
     q.loading.show({ message: 'Registering...' });
-    form.post(route('register'), {
-        onSuccess: () => {
-            q.notify({ type: 'positive', message: 'Registration successful' });
-        },
-        onError: () => {
-            q.notify({ type: 'negative', message: 'Fix the highlighted errors' });
-        },
-        onFinish: () => q.loading.hide()
-    });
+    form.contact = otpForm.mobile;
+    axios.post(route('register.store'), form.data())
+        .then(res => {
+            if (res.data.status) {
+                // Carry mobile over to form for registration
+                form.setError({});
+            }
+        })
+        .catch(err => {
+            otpForm.setError(err.response?.data?.errors || {});
+            q.notify({ type: 'negative', message: err.response?.data?.message || 'System Error' });
+        })
+        .finally(() => q.loading.hide());
 };
+
+const departmentOptions = ref([])
+const loadingDepartments = ref(false)
+
+
+
+const searchDepartments = async (val, update, abort) => {
+    if (!val || val.length < 2) {
+        update(() => {
+            departmentOptions.value = []
+        })
+        return
+    }
+    loadingDepartments.value = true
+
+    const url = route('register.search-department') // e.g. `/departments/search`
+
+    axios.get(url, { params: { search: val } })
+        .then(res => {
+            update(() => {
+                departmentOptions.value = res.data
+            })
+        })
+        .catch(err => {
+            $q.notify({
+                type: 'negative',
+                message: err.response?.data?.message || 'Failed to fetch departments',
+            })
+        })
+        .finally(() => {
+
+            loadingDepartments.value = false
+        })
+}
 </script>
 <style scoped>
 .login-title{

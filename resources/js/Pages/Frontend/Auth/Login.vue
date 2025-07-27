@@ -15,17 +15,17 @@
                         <q-form style="max-width: 450px" v-else class="column q-gutter-sm q-my-lg" @submit="handleSubmit">
 
                             <p class="login-title">Login</p>
-                            <label class="text-grey-8 text-weight-medium" for="email">Email</label>
+                            <label class="text-grey-8 text-weight-medium" for="email">Email/Phone</label>
                             <q-input id="email"
-                                     v-model="form.email"
+                                     v-model="form.login"
                                      dense
                                      outlined
                                      hide-bottom-space
                                      no-error-icon
-                                     :error="!!form.errors?.email"
-                                     :error-message="form.errors?.email"
+                                     :error="!!form.errors?.login"
+                                     :error-message="form.errors?.login"
                                      :rules="[
-                                 val=>!!val || 'Email is required'
+                                 val=>!!val || 'Email/Phone is required'
                              ]"/>
                             <label class="text-grey-8 text-weight-medium" for="email">Password</label>
                             <q-input :type="state.visiblePassword?'text':'password'"
@@ -49,7 +49,7 @@
                                 <a :href="route('login.forgot')" class="text-accent text-weight-medium cursor-pointer text-no-underline">Forgot Password ?</a>
                             </div>
                             <div class="flex">
-                                <q-btn class="sized-btn" color="btn-primary" type="submit" rounded label="Login" no-caps/>
+                                <q-btn class="sized-btn" color="blue" type="submit" rounded label="Login" no-caps/>
                             </div>
                         </q-form>
                     </div>
@@ -72,7 +72,7 @@ const state=reactive({
     visiblePassword:false
 })
 const form=useForm({
-    email:'',
+    login:'',
     password:''
 })
 const handleSubmit=e=>{

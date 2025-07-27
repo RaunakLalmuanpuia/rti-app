@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
 use App\Models\Otp;
 use App\Models\User;
 use App\Util\AppUtil;
@@ -65,5 +66,38 @@ class RegisterController extends Controller
 
 
         return response()->json(['status'=>true]);
+    }
+
+    public function searchDepartment(Request $request)
+    {
+        $search = $request->input('search', '');
+
+        $departments = Department::select('id', 'name')
+            ->where('name', 'LIKE', "%{$search}%")
+            ->whereNotIn('name', [
+                'AMC(LC)', 'LMC(LC)', 'Local Administration Department (Secretariat)'
+            ])
+            ->whereHas('users', function ($query) {
+                $query->where('bio', 'spio')->where('status', 'Accept');
+            })
+            ->limit(20)
+            ->get();
+
+        return response()->json($departments);
+    }
+
+    public function store(Request $request){
+//        dd($request->all());
+
+        $data=$this->validate($request, [
+            'name' => 'required',
+            'email'=>['required',Rule::unique('users','email')],
+            'contact'=>['required','digits:10',Rule::unique('users','contact')],
+            'password'=>'required|confirmed|min:6',
+            'role'=>'required',
+            'department'=>'required',
+        ]);
+
+
     }
 }

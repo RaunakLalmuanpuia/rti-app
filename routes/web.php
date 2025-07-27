@@ -34,6 +34,8 @@ Route::group([], function () {
     Route::get('register', [RegisterController::class, 'create'])->name('register.create');
     Route::post('register/send-otp', [RegisterController::class, 'sendOtp'])->name('register.send-otp');
     Route::post('register/confirm-otp', [RegisterController::class, 'confirmOtp'])->name('register.confirm-otp');
+    Route::get('search-department',[RegisterController::class,'searchDepartment'])->name('register.search-department');
+    Route::post('register/store', [RegisterController::class, 'store'])->name('register.store');
 });
 
 //Dashboard
