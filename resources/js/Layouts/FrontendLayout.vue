@@ -1,6 +1,5 @@
 <template>
     <q-layout @scroll="handleScroll" style="background: #ffffff" view="hHh lpR fff">
-
         <q-header height-hint="90"  :class="classObject">
             <q-toolbar  class="container flex justify-between items-center" style="height: 80px">
                 <div class="flex items-center q-gutter-sm">
@@ -23,24 +22,14 @@
 
         <q-footer  class="bg-secondary text-footer q-py-md">
             <q-toolbar class="container flex justify-between items-center">
-                <div class="flex q-gutter-sm">
+                <div class="flex q-gutter-sm items-center">
                     <img src="images/msegs.png"/>
                     <div>
                         <div>Crafted with care by</div>
                         <div>Mizoram State e-Governance Society</div>
                     </div>
                 </div>
-                <div class="column items-center">
-                    <div class="nav-link">Help Desk</div>
-                    <div class="nav-link">support-msegs@mizoram.gov.in/9233942951</div>
-                </div>
-                <div class="column items-end">
-                    <div>© 2024 RTI Online-GoM. All rights reserved</div>
-                    <div class="flex q-gutter-sm">
-                        <a class="footer-link" href="#">Privacy Policy</a>
-                        <a class="footer-link" href="#">Terms and condition</a>
-                    </div>
-                </div>
+
             </q-toolbar>
         </q-footer>
 
@@ -71,6 +60,7 @@ const handleScroll=detail=>{
 
 </script>
 <style scoped>
+
 .login-btn{
     min-width: 100px;
 }
