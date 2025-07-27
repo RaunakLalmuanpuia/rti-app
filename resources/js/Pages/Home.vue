@@ -1,6 +1,7 @@
 <template>
 
     <q-page class="container">
+<!--        Login part-->
         <div class=" bg-white q-mt-xl">
             <div class="row">
                 <!-- IMAGE FIRST -->
@@ -21,7 +22,7 @@
                             <q-btn @click="$inertia.get(route('dashboard'))" flat label="Go to dashboard" />
                         </div>
                         <q-form
-                            style="max-width: 500px; width: 100%"
+                            style="max-width: 450px; width: 100%"
                             v-else
                             class="column"
                             @submit.prevent="handleSubmit"
@@ -85,7 +86,7 @@
                     <!-- REGISTER SECTION -->
                     <p class="login-title text-center">Register</p>
                     <div class=" flex items-center justify-center column">
-                        <div style="max-width: 500px; width: 100%">  <!-- Increased width here -->
+                        <div style="max-width: 450px; width: 100%">  <!-- Increased width here -->
                             <a
                                 :href="route('register.create')"
                                 class="block bg-teal-300 text-black text-center py-4 px-6 rounded mb-4 hover:bg-teal-400 transition"
@@ -127,6 +128,30 @@
                 </div>
             </div>
         </div>
+        <br/>
+        <br/>
+        <br/>
+        <div id="support" class="support">
+            <div class="flex justify-center items-center">
+                <div class="text-center">
+                    <div class="support-title">Support</div>
+                    <div class="home-line"/>
+                </div>
+
+            </div>
+        </div>
+        <div class="flex justify-center items-center">
+            <div class="p-5 text-center">
+                <div class="text-xl font-semibold mb-3">
+                    Available Monday - Friday between 11:00AM - 3:00PM
+                </div>
+                <div class="flex flex-col sm:flex-row justify-center gap-4 text-base">
+                    <div>Mobile: 6033206128</div>
+                    <div>Landline: 0389-2334825</div>
+                </div>
+            </div>
+        </div>
+
     </q-page>
 
 
@@ -173,4 +198,21 @@ onMounted(() => {
     font-weight: normal;
     color: #080808;
 }
+.support{
+    color: #1ED9E8;
+    font-size: 20px;
+    font-weight: bold;
+}
+.support-title{
+
+    color: #191C51;
+    font-weight: bold;
+    font-size: 35px;
+}
+.home-line{
+    background-color: #1DEFFF;
+    height:5px;
+    width: 150px;
+}
+
 </style>

@@ -8,9 +8,11 @@
                 </div>
 
                 <div class="flex items-center q-gutter-md">
-<!--                    <a v-if="$q.screen.gt.sm" class="nav-link" href="#">Home</a>-->
-<!--                    <a v-if="$q.screen.gt.sm" class="nav-link" href="#feature">Feature</a>-->
-<!--                    <a v-if="$q.screen.gt.sm" class="nav-link" href="#about">About</a>-->
+                    <a v-if="$q.screen.gt.sm" class="nav-link" href="/">Home</a>
+                    <a v-if="$q.screen.gt.sm" class="nav-link" href="#support">Support</a>
+                    <a v-if="$q.screen.gt.sm" class="nav-link" href="#feature">Statistics</a>
+                    <a v-if="$q.screen.gt.sm" class="nav-link" href="#about">FAQs</a>
+                    <a v-if="$q.screen.gt.sm" class="nav-link" href="#manuals">Manuals</a>
                     <q-btn square @click="$inertia.get(route('login'))" class="login-btn" outline label="Login" no-caps/>
                 </div>
             </q-toolbar>

@@ -1,10 +1,12 @@
 <template>
-    <q-page class="container" >
 
-        <div class="bg-white  q-mt-xl">
+
+        <div class="container bg-white q-mt-xl">
             <div class="row ">
+                <div v-if="$q.screen.gt.sm" class="col-xs-12 col-sm-6">
+                    <q-img  height="480" width="580"  src="images/login.png"/>
+                </div>
                 <div class="col-xs-12 col-sm-6">
-
                     <div class="flex items-center justify-center">
                         <div v-if="!!$page.props.auth?.user" class="column q-gutter-sm">
                             <p class="text-dark">You are logged in</p>
@@ -49,25 +51,21 @@
                             <div class="flex">
                                 <q-btn class="sized-btn" color="btn-primary" type="submit" rounded label="Login" no-caps/>
                             </div>
-                            <p class="signup">Don’t have an Account? <a :href="route('register.create')" class="text-accent text-no-underline">SIGN UP</a></p>
                         </q-form>
                     </div>
+                </div>
 
-                </div>
-                <div v-if="$q.screen.gt.sm" class="col-xs-12 col-sm-6">
-                    <q-img height="480" width="580" src="images/login-img.png"/>
-                </div>
             </div>
 
         </div>
-    </q-page>
+
 </template>
 <script setup>
-// import FrontendLayout from "@/Layouts/FrontendLayout.vue";
+import FrontendLayout from "@/Layouts/FrontendLayout.vue";
 import {useForm} from "@inertiajs/vue3";
 import {useQuasar} from "quasar";
 import {reactive} from "vue";
-// defineOptions({layout:FrontendLayout})
+defineOptions({layout:FrontendLayout})
 
 const q = useQuasar();
 const state=reactive({
