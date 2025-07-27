@@ -10,7 +10,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <q-page class="q-pa-md">
+    <q-page class="container q-pa-md">
         <div class="row q-col-gutter-md">
             <!-- Detail Section -->
             <div class="col-12 col-md-6">

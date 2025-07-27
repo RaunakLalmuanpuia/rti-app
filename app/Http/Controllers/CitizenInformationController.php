@@ -41,7 +41,7 @@ class CitizenInformationController extends Controller
         $perPage = $request->input('rowsPerPage', 15);
 
 
-        $query = Information::with('department')
+        $query = Information::with(['department','local_council'])
             ->where('user_id', $user->id)
             ->whereNull('complain')
             ->whereNull('transfer');
@@ -51,6 +51,9 @@ class CitizenInformationController extends Controller
                 $q->where('citizen_name', 'like', "%{$search}%")
                     ->orWhere('citizen_question', 'like', "%{$search}%")
                     ->orWhereHas('department', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('local_council', function ($q2) use ($search) {
                         $q2->where('name', 'like', "%{$search}%");
                     });
             });

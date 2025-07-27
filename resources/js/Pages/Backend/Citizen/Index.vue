@@ -46,7 +46,7 @@
 
             <template #body-cell-department="props">
                 <q-td>
-                    {{ props.row?.department?.name }}
+                    {{ props.row?.department?.name ?? props.row?.local_council?.name  }}
                 </q-td>
             </template>
 

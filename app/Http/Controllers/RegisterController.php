@@ -15,31 +15,28 @@ class RegisterController extends Controller
 {
     public function create(Request $request)
     {
-//        if (\auth()->check()) {
-//            return redirect()->to(route('dashboard'));
-//        }
+        if (\auth()->check()) {
+            return redirect()->to(route('dashboard'));
+        }
         return inertia('Frontend/Auth/Register');
     }
     public function sendOtp(Request $request)
     {
-        $data=$this->validate($request, [
-            'name' => 'required',
-            'email'=>['required',Rule::unique('users','email')],
-            'mobile'=>['required','digits:10',Rule::unique('users','mobile')],
-            'password'=>'required|confirmed|min:6'
+
+        $request->validate([
+            'mobile'=>['required','digits:10',Rule::unique('users','contact')],
         ]);
 
         $phoneOtp=env('APP_DEBUG')?1111:rand(1000, 9999);
 
-
-        Otp::query()->create([
-            'recipient' => $data['mobile'],
-            'type' => "Register",
+        OTP::query()->create([
+            'contact' => $request['mobile'],
+            'purpose' => "Register",
             'otp' => $phoneOtp
         ]);
 
 
-        AppUtil::sendOtp($phoneOtp, $data['mobile']);
+//        AppUtil::sendOtp($phoneOtp, $data['mobile']);
 
 
         return response()->json(['status'=>true]);
@@ -47,36 +44,26 @@ class RegisterController extends Controller
 
     public function confirmOtp(Request $request)
     {
+
         $data=$this->validate($request, [
             'mobile_otp'=>'required',
-            'name' => 'required',
-            'email'=>['required',Rule::unique('users','email')],
-            'mobile'=>['required','digits:10',Rule::unique('users','mobile')],
-            'password'=>'required|confirmed|min:6'
+            'mobile'=>['required','digits:10',Rule::unique('users','contact')],
         ]);
-        $mobileOtp=Otp::query()->where('recipient', $data['mobile'])
+
+        $mobileOtp= OTP::query()->where('contact', $data['mobile'])
             ->where('otp',$data['mobile_otp'])
-            ->where('used',false)
+            ->where('purpose','Register')
             ->first();
 
-        if (blank($mobileOtp)) {
-            return response()->json(['errors' => [
-                'mobile_otp' => 'Invalid Mobile OTP'
-            ]],400);
+        if (!$mobileOtp || $mobileOtp->created_at->addMinutes(5)->lt(now())) {
+            return response()->json([
+                'errors' => [
+                    'mobile_otp' => 'Invalid Mobile OTP'
+                ]
+            ], 400);
         }
 
-        $temp = array_merge($data,['password'=>Hash::make($data['password'])]);
 
-        $user=DB::transaction(function () use ($mobileOtp, $temp) {
-            $user= User::query()->create($temp);
-            $user->assignRole('Player');
-
-            $mobileOtp->update(['used'=>true]);
-
-            return $user;
-        });
-
-        Auth::login($user);
-        return to_route('dashboard');
+        return response()->json(['status'=>true]);
     }
 }

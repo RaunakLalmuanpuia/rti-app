@@ -75,7 +75,7 @@
                     <div>AMC leh LMC area chhunga Local Council te register-na hmun</div>
                 </a>
                 <a
-                    href="/staffregister"
+                    :href="route('register.create')"
                     class="flex-1 bg-white text-black p-4 rounded hover:ring-2 hover:ring-blue-400 transition"
                 >
                     <div class="text-indigo-700 font-bold">Government Official</div>
@@ -98,9 +98,10 @@
 </template>
 
 <script setup>
+import FrontendLayout from "@/Layouts/FrontendLayout.vue";
 import { ref, onMounted } from 'vue'
 import { useForm } from '@inertiajs/vue3'
-
+defineOptions({layout:FrontendLayout})
 
 
 const isMobile = ref(false)

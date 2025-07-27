@@ -1,5 +1,5 @@
 <template>
-    <div class="q-pa-lg flex flex-center">
+    <div class="container q-pa-lg flex flex-center">
         <q-form @submit.prevent="submitForm" class="bg-white q-pa-xl q-ma-md rounded-borders shadow-2 full-width" style="max-width: 700px">
             <div class="text-h6 q-mb-sm">New RTI Application / RTI hmanga dilna Form</div>
             <div class="text-body2 q-mb-md">

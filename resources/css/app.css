@@ -1,3 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap');
+
 @import "tailwindcss";
 
+
+*{
+    font-family: 'Poppins', sans-serif;
+}
+
+.brand-name{
+    font-size: 21px;
+    font-weight: 600;
+    font-family: Poppins, serif;
+}
+.sized-btn{
+    min-width: 140px;
+}
+
+.default-background{
+    background: #f7f7f7;
+}
+.shadow-default{
+    box-shadow: 0px 2px 8px #E6E6E6;
+    border: 1px solid transparent;
+    border-radius: 8px;
+}
+
+@media (max-width: 599px) {
+    .container{
+        padding: 8px;
+    }
+    .container-sm{
+        max-width:450px;
+        margin-right: auto;
+        margin-left: auto;
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+}
+@media (max-width: 1024px) {
+    .container {
+        max-width: 900px;
+        margin-right: auto;
+        margin-left: auto;
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+    .container-sm{
+        max-width: 500px;
+        margin-right: auto;
+        margin-left: auto;
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+}
+@media (max-width:1439px) {
+    .container {
+        max-width: 1100px;
+        margin-right: auto;
+        margin-left: auto;
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+    .container-sm{
+        max-width: 500px;
+        margin-right: auto;
+        margin-left: auto;
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+}
+
+@media (max-width: 3919px) {
+    .container {
+        max-width: 1250px;
+        margin-right: auto;
+        margin-left: auto;
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+    .container-sm{
+        max-width: 500px;
+        margin-right: auto;
+        margin-left: auto;
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+}
+@media print {
+    .container{
+        position: absolute;
+        top: 12px;
+        width: 100%;
+    }
+}
 
