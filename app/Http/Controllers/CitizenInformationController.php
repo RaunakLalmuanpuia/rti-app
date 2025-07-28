@@ -29,7 +29,7 @@ class CitizenInformationController extends Controller
     }
 
     public function index(){
-        return Inertia::render('Backend/Citizen/Index');
+        return Inertia::render('Backend/Citizen/Information/Index');
     }
 
     public function indexJson(Request $request)
