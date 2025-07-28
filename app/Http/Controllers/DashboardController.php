@@ -25,12 +25,15 @@ class DashboardController extends Controller
         }
 
         if ($user->role === 5) {
-            return to_route('dashboard.official');
+            if($user->status === 'Accept'){
+                return to_route('dashboard.official');
+            }
+            else{
+                return Inertia::render('Frontend/Auth/Register/Pending');
+            }
         }
 
-        return inertia('Dashboard', [
-            'user' => $user,
-        ]);
+        return inertia('Frontend/Auth/Register/Pending');
     }
 
     public function citizen(Request $request)

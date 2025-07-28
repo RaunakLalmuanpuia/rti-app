@@ -26,7 +26,7 @@ class RegisterController extends Controller
         if (\auth()->check()) {
             return redirect()->to(route('dashboard'));
         }
-        return inertia('Frontend/Auth/Register/official');
+        return inertia('Frontend/Auth/Register/Official');
     }
     public function createLocalCouncil(Request $request)
     {
@@ -91,9 +91,6 @@ class RegisterController extends Controller
             ->whereNotIn('name', [
                 'AMC(LC)', 'LMC(LC)', 'Local Administration Department (Secretariat)'
             ])
-            ->whereHas('users', function ($query) {
-                $query->where('bio', 'spio')->where('status', 'Accept');
-            })
             ->limit(20)
             ->get();
 
@@ -138,11 +135,92 @@ class RegisterController extends Controller
             'department'=>'required',
         ]);
 
+        if($data['role']=='spio'){
+            $mUser = User::where('bio','spio')->where('department',$data['department'])->first();
+            if($mUser!=null){
+                abort(500, 'SPIO already present in this department');
+            }
+        }
+
+        $departmentInput = $data['department'];
+
+        // Normalize department input
+        $departmentIds = is_array($departmentInput) ? $departmentInput : [$departmentInput];
+
+        if ($data['role'] === 'daa') {
+            $conflictingDeptIds = [];
+
+            // Check structured column
+            $existingDaas = User::where('bio', 'daa')
+                ->whereIn('department', $departmentIds)
+                ->pluck('department')
+                ->toArray();
+
+            $conflictingDeptIds = array_merge($conflictingDeptIds, $existingDaas);
+
+            // Check CSV department (sex column)
+            foreach ($departmentIds as $deptId) {
+                $csvDaa = DB::table('users')
+                    ->whereRaw('FIND_IN_SET(?, sex)', [$deptId])
+                    ->where('bio', 'daa')
+                    ->exists();
+
+                if ($csvDaa) {
+                    $conflictingDeptIds[] = $deptId;
+                }
+            }
+
+            // Remove duplicates
+            $conflictingDeptIds = array_unique($conflictingDeptIds);
+
+            if (!empty($conflictingDeptIds)) {
+                $departmentNames = Department::whereIn('id', $conflictingDeptIds)
+                    ->pluck('name')
+                    ->toArray();
+
+                $namesList = implode(', ', $departmentNames);
+                abort(500, 'DAA already exists in the following department(s): ' . $namesList);
+            }
+        }
+
+        $user = new User();
+        $user->name = $request->name ;
+
+
+        $user->designation = $request->designation;
+
+        $user->email = $request->email ;
+        $user->password =  Hash::make($request->password) ;
+        $user->contact = $request->contact ;
+        $user->address = $request->address ;
+
+
+        if (is_array($data['department'])) {
+            $user->department = $data['department'][0]; // Always assign the first department
+            if (count($request->department) > 1) {
+                // Store all departments as CSV in the 'sex' column
+                $user->sex = implode(',', $request->department);
+            }
+        } else {
+            // Single department case
+            $user->department = $request->department;
+        }
+
+        $user->role = 5 ;
+        $user->bio = $data['role'];
+        $user->save();
+
+        Auth::login($user);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User Registered Successfully'
+        ]);
 
     }
 
     public function storeLocalCouncil(Request $request){
-//        dd($request->all());
+        dd($request->all());
 
         $data=$this->validate($request, [
             'name' => 'required',

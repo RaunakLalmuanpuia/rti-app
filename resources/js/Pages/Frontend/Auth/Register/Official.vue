@@ -99,7 +99,15 @@
                         <!-- Role select -->
                         <q-select label="Role" v-model="form.role" outlined no-error-icon :error="!!form.errors?.role"
                                   :error-message="form.errors?.role?.toString()"
-                                  :options="['SAPIO','SPIO','DAA']"
+                                  emit-value
+                                  map-options
+                                  :options="[
+                                    { label: 'SAPIO', value: 'aspio' },
+                                    { label: 'SPIO', value: 'spio' },
+                                    { label: 'DAA', value: 'daa' }
+                                  ]"
+                                  option-label="label"
+                                  option-value="value"
                                   :rules="[val => !!val || 'Role is required']" />
 
                         <!-- Department select - allow multiple when role is DAA -->
@@ -115,13 +123,14 @@
                             option-label="name"
                             label="Department"
                             clearable
+                            use-chips
                             v-model="form.department"
                             outlined
                             no-error-icon
                             :error="!!form.errors?.department"
                             :error-message="form.errors?.department?.toString()"
                             :rules="[val => !!val || 'Department is required']"
-                            :multiple="form.role === 'DAA'"
+                            :multiple="form.role === 'daa'"
                         />
 
                         <div class="flex q-mt-sm">
@@ -142,7 +151,7 @@ import FrontendLayout from "@/Layouts/FrontendLayout.vue";
 
 import {router, useForm} from "@inertiajs/vue3";
 import {useQuasar} from "quasar";
-import {reactive, ref} from "vue";
+import {reactive, ref, watch } from "vue";
 import axios from "axios";
 defineOptions({layout:FrontendLayout})
 
@@ -210,12 +219,13 @@ const handleOtpConfirm = () => {
 const handleRegister = () => {
     q.loading.show({ message: 'Registering...' });
     form.contact = otpForm.mobile;
-    axios.post(route('register.store'), form.data())
+    axios.post(route('register.store-official'), form.data())
         .then(res => {
             if (res.data.status) {
                 // Carry mobile over to form for registration
                 form.setError({});
             }
+            router.get(route('dashboard'))
         })
         .catch(err => {
             otpForm.setError(err.response?.data?.errors || {});
@@ -247,7 +257,7 @@ const searchDepartments = async (val, update, abort) => {
             })
         })
         .catch(err => {
-            $q.notify({
+            q.notify({
                 type: 'negative',
                 message: err.response?.data?.message || 'Failed to fetch departments',
             })
@@ -257,6 +267,18 @@ const searchDepartments = async (val, update, abort) => {
             loadingDepartments.value = false
         })
 }
+
+watch(() => form.role, (newRole) => {
+    if (newRole === 'daa') {
+        if (!Array.isArray(form.department)) {
+            form.department = form.department ? [form.department] : []
+        }
+    } else {
+        if (Array.isArray(form.department)) {
+            form.department = form.department[0] || null
+        }
+    }
+})
 </script>
 <style scoped>
 .login-title{

@@ -13,7 +13,8 @@
                     <a v-if="$q.screen.gt.sm" class="nav-link" href="#feature">Statistics</a>
                     <a v-if="$q.screen.gt.sm" class="nav-link" href="#about">FAQs</a>
                     <a v-if="$q.screen.gt.sm" class="nav-link" href="#manuals">Manuals</a>
-                    <q-btn square @click="$inertia.get(route('login'))" class="login-btn" outline label="Login" no-caps/>
+                    <q-btn v-if="!$page.props.auth?.user" square @click="$inertia.get(route('login'))" class="login-btn" outline label="Login" no-caps/>
+                    <q-btn v-if="$page.props.auth?.user" square @click="$inertia.delete(route('login.destroy'))" class="login-btn" outline label="Logout" no-caps/>
                 </div>
             </q-toolbar>
         </q-header>
