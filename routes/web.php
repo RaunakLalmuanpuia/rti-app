@@ -37,6 +37,7 @@ Route::group([], function () {
     Route::post('register/send-otp', [RegisterController::class, 'sendOtp'])->name('register.send-otp');
     Route::post('register/confirm-otp', [RegisterController::class, 'confirmOtp'])->name('register.confirm-otp');
     Route::get('search-department',[RegisterController::class,'searchDepartment'])->name('register.search-department');
+    Route::get('get-local_council',[RegisterController::class,'getLocalCouncil'])->name('register.get-local_council');
     Route::post('register/store-citizen', [RegisterController::class, 'storeCitizen'])->name('register.store-citizen');
     Route::post('register/store-official', [RegisterController::class, 'storeOfficial'])->name('register.store-official');
     Route::post('register/store-local-council', [RegisterController::class, 'storeLocalCouncil'])->name('register.store-local-council');

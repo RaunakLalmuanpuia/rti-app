@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
+use App\Models\LocalCouncil;
 use App\Models\Otp;
 use App\Models\User;
 use App\Util\AppUtil;
@@ -33,7 +34,7 @@ class RegisterController extends Controller
         if (\auth()->check()) {
             return redirect()->to(route('dashboard'));
         }
-        return inertia('Frontend/Auth/Register/official');
+        return inertia('Frontend/Auth/Register/LocalCouncil');
     }
     public function sendOtp(Request $request)
     {
@@ -97,6 +98,15 @@ class RegisterController extends Controller
         return response()->json($departments);
     }
 
+    public function getLocalCouncil(Request $request){
+
+        $councils = LocalCouncil::where('district', $request->district)
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        return response()->json($councils);
+
+    }
     public function storeCitizen(Request $request){
 
         $data=$this->validate($request, [
@@ -128,6 +138,8 @@ class RegisterController extends Controller
 
         $data=$this->validate($request, [
             'name' => 'required',
+            'designation'=>'required',
+            'address'=>'required',
             'email'=>['required',Rule::unique('users','email')],
             'contact'=>['required','digits:10',Rule::unique('users','contact')],
             'password'=>'required|confirmed|min:6',
@@ -220,15 +232,43 @@ class RegisterController extends Controller
     }
 
     public function storeLocalCouncil(Request $request){
-        dd($request->all());
+//        dd($request->all());
 
         $data=$this->validate($request, [
             'name' => 'required',
+            'designation'=>'required',
+            'district' => 'required',
+            'address'=>'required',
             'email'=>['required',Rule::unique('users','email')],
             'contact'=>['required','digits:10',Rule::unique('users','contact')],
             'password'=>'required|confirmed|min:6',
-            'role'=>'required',
-            'department'=>'required',
+            'local_council'=>'required',
+        ]);
+
+        $mUser = User::where('bio','spio')->where('local_council',$data['local_council'])->first();
+        if($mUser!=null){
+            abort(500, 'SPIO already present in this Local Council');
+        }
+
+        $user = new User();
+
+        $user->name = $data['name'] ;
+        $user->designation = $data['designation'];
+        $user->email = $data['email'] ;
+        $user->password =  Hash::make($data['password']) ;
+        $user->contact = $data['contact'] ;
+        $user->address = $data['address'] ;
+        $user->local_council= $data['local_council'];
+
+        $user->role = 5 ;
+        $user->bio = "spio" ;
+        $user->save();
+
+        Auth::login($user);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User Registered Successfully'
         ]);
 
 

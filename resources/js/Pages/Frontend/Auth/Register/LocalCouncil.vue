@@ -82,9 +82,9 @@
                                  outlined no-error-icon :error="!!form.errors?.password_confirmation"
                                  :error-message="form.errors?.password_confirmation?.toString()"
                                  :rules="[
-             val => !!val || 'Confirm Password is required',
-             val => val === form.password || 'Confirm password does not match password'
-           ]" />
+                                     val => !!val || 'Confirm Password is required',
+                                     val => val === form.password || 'Confirm password does not match password'
+                                   ]" />
 
                         <!-- Contact (disabled and bound to otpForm.mobile) -->
                         <q-input label="Contact" v-model="otpForm.mobile" outlined no-error-icon disable
@@ -96,33 +96,21 @@
                                  :error-message="form.errors?.address?.toString()"
                                  :rules="[val => !!val || 'Address is required']" />
 
-                        <!-- Role select -->
-                        <q-select label="Role" v-model="form.role" outlined no-error-icon :error="!!form.errors?.role"
-                                  :error-message="form.errors?.role?.toString()"
-                                  :options="['SAPIO','SPIO','DAA']"
-                                  :rules="[val => !!val || 'Role is required']" />
+                        <q-select label="District" v-model="form.district" outlined no-error-icon :error="!!form.errors?.district"
+                                 :error-message="form.errors?.district?.toString()"
+                                  :options="['Aizawl', 'Lunglei']"
+                                  :rules="[val => !!val || 'District is required']" />
 
-                        <!-- Department select - allow multiple when role is DAA -->
-                        <q-select
-                            :options="departmentOptions"
-                            @filter="searchDepartments"
-                            :loading="loadingDepartments"
-                            emit-value
-                            use-input
-                            input-debounce="300"
-                            map-options
-                            option-value="id"
-                            option-label="name"
-                            label="Department"
-                            clearable
-                            v-model="form.department"
-                            outlined
-                            no-error-icon
-                            :error="!!form.errors?.department"
-                            :error-message="form.errors?.department?.toString()"
-                            :rules="[val => !!val || 'Department is required']"
-                            :multiple="form.role === 'DAA'"
-                        />
+
+                        <q-select label="Local Council" v-model="form.local_council" outlined no-error-icon :error="!!form.errors?.local_council"
+                                  :error-message="form.errors?.district?.toString()"
+                                  :options="localCouncilOptions"
+                                  option-label="label"
+                                  option-value="value"
+                                  emit-value
+                                  map-options
+                                  clearable
+                                  :rules="[val => !!val || 'Local Council is required']" />
 
                         <div class="flex q-mt-sm">
                             <q-btn class="sized-btn" color="blue" type="submit" rounded label="Register" no-caps />
@@ -142,7 +130,7 @@ import FrontendLayout from "@/Layouts/FrontendLayout.vue";
 
 import {router, useForm} from "@inertiajs/vue3";
 import {useQuasar} from "quasar";
-import {reactive, ref} from "vue";
+import {reactive, ref, watch} from "vue";
 import axios from "axios";
 defineOptions({layout:FrontendLayout})
 
@@ -162,14 +150,17 @@ const form = useForm({
     designation:'',
     address:'',
     contact:'',
-    role:'',
-    department:null,
+    district:'',
+    local_council:'',
 });
 
 const otpForm = useForm({
     mobile: '',
     mobile_otp: ''
 });
+
+
+const localCouncilOptions = ref([])
 
 const handleSendOtp = () => {
     q.loading.show({ message: 'Sending OTP...' });
@@ -210,12 +201,13 @@ const handleOtpConfirm = () => {
 const handleRegister = () => {
     q.loading.show({ message: 'Registering...' });
     form.contact = otpForm.mobile;
-    axios.post(route('register.store'), form.data())
+    axios.post(route('register.store-local-council'), form.data())
         .then(res => {
             if (res.data.status) {
                 // Carry mobile over to form for registration
                 form.setError({});
             }
+            router.get(route('dashboard'))
         })
         .catch(err => {
             otpForm.setError(err.response?.data?.errors || {});
@@ -224,39 +216,26 @@ const handleRegister = () => {
         .finally(() => q.loading.hide());
 };
 
-const departmentOptions = ref([])
-const loadingDepartments = ref(false)
 
+const fetchLocalCouncils = async (district) => {
+    localCouncilOptions.value = []
+    if (!district) return
 
-
-const searchDepartments = async (val, update, abort) => {
-    if (!val || val.length < 2) {
-        update(() => {
-            departmentOptions.value = []
-        })
-        return
+    try {
+        const res = await axios.get(route('register.get-local_council'), { params: { district: district } })
+        localCouncilOptions.value = res.data.map((c) => ({
+            label: c.name,
+            value: c.id,
+        }))
+    } catch (e) {
+        console.error('Failed to fetch local councils', e)
     }
-    loadingDepartments.value = true
-
-    const url = route('register.search-department') // e.g. `/departments/search`
-
-    axios.get(url, { params: { search: val } })
-        .then(res => {
-            update(() => {
-                departmentOptions.value = res.data
-            })
-        })
-        .catch(err => {
-            $q.notify({
-                type: 'negative',
-                message: err.response?.data?.message || 'Failed to fetch departments',
-            })
-        })
-        .finally(() => {
-
-            loadingDepartments.value = false
-        })
 }
+// Watch for district changes
+watch(() => form.district, (newDistrict) => {
+    form.local_council = ''
+    fetchLocalCouncils(newDistrict)
+})
 </script>
 <style scoped>
 .login-title{
@@ -265,12 +244,6 @@ const searchDepartments = async (val, update, abort) => {
     color: #191c51;
     font-size: 28px;
     font-weight: bold;
-}
-.signup{
-    font-family: Roboto,serif;
-    font-size: 16px;
-    font-weight: normal;
-    color: #080808;
 }
 .register-card{
     padding: 32px;

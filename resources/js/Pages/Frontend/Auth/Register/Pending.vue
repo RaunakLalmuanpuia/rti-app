@@ -14,7 +14,7 @@ defineOptions({layout:FrontendLayout})
                 <div class="flex items-center justify-center">
                     <div class="column q-gutter-sm">
                         <p class="login-title">Pending For Approval</p>
-                        <q-btn @click="$inertia.get(route(''))" flat label="Go to Home"/>
+                        <q-btn @click="$inertia.get('/')" flat label="Go to Home"/>
                     </div>
                 </div>
             </div>
