@@ -14,12 +14,26 @@ use Illuminate\Validation\Rule;
 
 class RegisterController extends Controller
 {
-    public function create(Request $request)
+    public function createCitizen(Request $request)
     {
         if (\auth()->check()) {
             return redirect()->to(route('dashboard'));
         }
-        return inertia('Frontend/Auth/Register');
+        return inertia('Frontend/Auth/Register/Citizen');
+    }
+    public function createOfficial(Request $request)
+    {
+        if (\auth()->check()) {
+            return redirect()->to(route('dashboard'));
+        }
+        return inertia('Frontend/Auth/Register/official');
+    }
+    public function createLocalCouncil(Request $request)
+    {
+        if (\auth()->check()) {
+            return redirect()->to(route('dashboard'));
+        }
+        return inertia('Frontend/Auth/Register/official');
     }
     public function sendOtp(Request $request)
     {
@@ -86,7 +100,48 @@ class RegisterController extends Controller
         return response()->json($departments);
     }
 
-    public function store(Request $request){
+    public function storeCitizen(Request $request){
+
+        $data=$this->validate($request, [
+            'name' => 'required',
+            'email'=>['required',Rule::unique('users','email')],
+            'contact'=>['required','digits:10',Rule::unique('users','contact')],
+            'password'=>'required|confirmed|min:6',
+            'address'=>'required',
+        ]);
+
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => $data['password'],
+            'contact' =>$data['contact'],
+            'address' => $data['address'],
+            'role' => 0,
+        ]);
+
+        Auth::login($user);
+
+        return to_route('dashboard');
+
+    }
+
+    public function storeOfficial(Request $request){
+//        dd($request->all());
+
+        $data=$this->validate($request, [
+            'name' => 'required',
+            'email'=>['required',Rule::unique('users','email')],
+            'contact'=>['required','digits:10',Rule::unique('users','contact')],
+            'password'=>'required|confirmed|min:6',
+            'role'=>'required',
+            'department'=>'required',
+        ]);
+
+
+    }
+
+    public function storeLocalCouncil(Request $request){
 //        dd($request->all());
 
         $data=$this->validate($request, [

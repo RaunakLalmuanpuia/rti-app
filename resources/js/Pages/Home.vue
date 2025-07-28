@@ -88,7 +88,7 @@
                     <div class=" flex items-center justify-center column">
                         <div style="max-width: 450px; width: 100%">  <!-- Increased width here -->
                             <a
-                                :href="route('register.create')"
+                                :href="route('register.create-citizen')"
                                 class="block bg-teal-300 text-black text-center py-4 px-6 rounded mb-4 hover:bg-teal-400 transition"
                             >
                                 <div class="font-bold">Mipui tan/ Citizen</div>
@@ -97,20 +97,20 @@
 
                             <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
                                 <a
-                                    href="/localcouncilregister"
-                                    class="flex-1 bg-white border border-black text-black p-4 rounded hover:ring-2 hover:ring-blue-400 transition"
-                                >
-                                    <div class="text-pink-600 font-bold">Local Council</div>
-                                    <div>AMC leh LMC area chhunga Local Council te register-na hmun</div>
-                                </a>
-                                <a
-                                    :href="route('register.create')"
+                                    :href="route('register.create-official')"
                                     class="flex-1 bg-white border border-black text-black p-4 rounded hover:ring-2 hover:ring-blue-400 transition"
                                 >
                                     <div class="text-indigo-700 font-bold">Government Official</div>
                                     <div>
                                         RTI chhangtu te <span class="font-bold">(SPIO, SAPIO leh DAA)</span> te register-na tur hmun
                                     </div>
+                                </a>
+                                <a
+                                    :href="route('register.create-local-council')"
+                                    class="flex-1 bg-white border border-black text-black p-4 rounded hover:ring-2 hover:ring-blue-400 transition"
+                                >
+                                    <div class="text-pink-600 font-bold">Local Council</div>
+                                    <div>AMC leh LMC area chhunga Local Council te register-na hmun</div>
                                 </a>
                             </div>
                         </div>

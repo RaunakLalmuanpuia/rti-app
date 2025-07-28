@@ -31,11 +31,15 @@ Route::group([], function () {
 
 //Register
 Route::group([], function () {
-    Route::get('register', [RegisterController::class, 'create'])->name('register.create');
+    Route::get('register-citizen', [RegisterController::class, 'createCitizen'])->name('register.create-citizen');
+    Route::get('register-official', [RegisterController::class, 'createOfficial'])->name('register.create-official');
+    Route::get('register-local-council', [RegisterController::class, 'createLocalCouncil'])->name('register.create-local-council');
     Route::post('register/send-otp', [RegisterController::class, 'sendOtp'])->name('register.send-otp');
     Route::post('register/confirm-otp', [RegisterController::class, 'confirmOtp'])->name('register.confirm-otp');
     Route::get('search-department',[RegisterController::class,'searchDepartment'])->name('register.search-department');
-    Route::post('register/store', [RegisterController::class, 'store'])->name('register.store');
+    Route::post('register/store-citizen', [RegisterController::class, 'storeCitizen'])->name('register.store-citizen');
+    Route::post('register/store-official', [RegisterController::class, 'storeOfficial'])->name('register.store-official');
+    Route::post('register/store-local-council', [RegisterController::class, 'storeLocalCouncil'])->name('register.store-local-council');
 });
 
 //Dashboard

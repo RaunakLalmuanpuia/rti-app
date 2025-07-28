@@ -357,6 +357,7 @@ onMounted(() => {
     const scriptElement = document.createElement('script')
     scriptElement.setAttribute('src', 'https://checkout.razorpay.com/v1/checkout.js')
     document.head.appendChild(scriptElement)
+
 })
 </script>
 
